@@ -29,18 +29,18 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['id'],
-      username: json['username'],
-      name: json['name'],
-      email: json['email'],
-      profilePicture: json['profile_picture'],
-      studentId: json['student_id'],
-      department: json['department'],
-      batch: json['batch'],
-      semester: json['semester'],
-      phoneNumber: json['phone_number'],
-      enrollmentStatus: json['enrollment_status'],
-      program: json['program'],
+      id: json['id'].toString(),
+      username: json['username'].toString(),
+      name: json['name'].toString(),
+      email: json['email'].toString(),
+      profilePicture: json['profile_picture'].toString(),
+      studentId: json['student_id'].toString(),
+      department: json['department'].toString(),
+      batch: 2026,
+      semester: 6,
+      phoneNumber: json['phone_number'].toString(),
+      enrollmentStatus: json['enrollment_status'].toString(),
+      program: json['program'].toString(),
     );
   }
 

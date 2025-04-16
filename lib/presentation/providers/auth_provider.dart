@@ -50,10 +50,9 @@ class AuthProvider extends ChangeNotifier {
 
     try {
       final response = await _apiService.login(username, password);
-      if (response['success'] == true) {
-        _currentUser = User.fromJson(response['user']);
+      if (response['success']) {
+        _currentUser = User.fromJson(response['data']);
         _isAuthenticated = true;
-        
         // Save user and token data
         await _storage.write(key: 'user', value: jsonEncode(_currentUser!.toJson()));
         await _storage.write(key: 'token', value: response['token']);
@@ -68,7 +67,8 @@ class AuthProvider extends ChangeNotifier {
         return false;
       }
     } catch (e) {
-      _error = 'Failed to connect to server. Please check your internet connection.';
+      _error = 'Failed to connect to server. Please check your internet connection. $e';
+      print(_error);
       _isLoading = false;
       notifyListeners();
       return false;

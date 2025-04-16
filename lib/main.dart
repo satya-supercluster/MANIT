@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
-import 'package:manit/presentation/screens/dashboard_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
@@ -55,15 +54,7 @@ class MyApp extends StatelessWidget {
         theme: AppTheme.lightTheme(),
         darkTheme: AppTheme.darkTheme(),
         themeMode: ThemeMode.system,
-        home: Consumer<AuthProvider>(
-        builder: (context, userProv, _) {
-          if (userProv.isAuthenticated) {
-            return const DashboardScreen();
-          } else {
-            return const LoginScreen();
-          }
-        },
-      ),
+        home: LoginScreen()
       ),
     );
   }

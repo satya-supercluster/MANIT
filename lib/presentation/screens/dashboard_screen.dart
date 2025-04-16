@@ -21,11 +21,15 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   bool _isLoading = true;
   int _selectedIndex = 0;
+  bool _hasLoadedData = false;
 
   @override
   void initState() {
     super.initState();
-    _loadData();
+    if (!_hasLoadedData) {
+      _loadData();
+      _hasLoadedData = true;
+    }
   }
   
   // Load initial data

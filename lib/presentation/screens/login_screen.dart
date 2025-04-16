@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../../core/constants/app_theme.dart';
+import './dashboard_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -43,16 +44,28 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   }
 
   void _login() async {
-    if (_formKey.currentState!.validate()) {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final success = await authProvider.login(
-        _usernameController.text.trim(),
-        _passwordController.text,
+  if (_formKey.currentState!.validate()) {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final success = await authProvider.login(
+      _usernameController.text.trim(),
+      _passwordController.text,
+    );
+
+    if (success) {
+      // Navigate to DashboardScreen and replace LoginScreen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const DashboardScreen()),
       );
-      print("login result::");
-      print(success);
+    } else {
+      // Optional: Show error using a snackbar or dialog
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Login failed. Please try again.')),
+      );
     }
   }
+}
+
 
   @override
   Widget build(BuildContext context) {

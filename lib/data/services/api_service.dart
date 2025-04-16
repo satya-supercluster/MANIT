@@ -32,8 +32,8 @@ class ApiService {
           'password': password,
         }),
       );
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        return response.data;
+      if (response.statusCode == 200) {
+        return {'success': true, 'data': response.data};
       } else if (response.statusCode == 401) {
         return {
           'success': false,
@@ -60,7 +60,6 @@ class ApiService {
         '$baseUrl/student_profile_check',
         options: Options(headers: await _getHeaders()),
       );
-
       if (response.statusCode == 200) {
         return {'success': true, 'data': response.data};
       } else if (response.statusCode == 401) {
