@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
-import 'dashboard_screen.dart';
 import '../../core/constants/app_theme.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -44,7 +43,6 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   }
 
   void _login() async {
-    print("in login");
     if (_formKey.currentState!.validate()) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final success = await authProvider.login(
@@ -53,11 +51,6 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       );
       print("login result::");
       print(success);
-      if (success && mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const DashboardScreen()),
-        );
-      }
     }
   }
 
@@ -96,10 +89,10 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                       ),
                       const SizedBox(height: 24),
                       Text(
-                        'College Academic Portal',
+                        'Academic Portal',
                         style: theme.textTheme.headlineMedium?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: theme.colorScheme.onBackground,
+                          color: theme.colorScheme.onSurface,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -107,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                       Text(
                         'Sign in to access your academic information',
                         style: theme.textTheme.bodyLarge?.copyWith(
-                          color: theme.colorScheme.onBackground.withOpacity(0.7),
+                          color: theme.colorScheme.onSurface.withOpacity(0.7),
                         ),
                         textAlign: TextAlign.center,
                       ),

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
+import 'package:manit/presentation/screens/dashboard_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
@@ -9,7 +10,6 @@ import 'core/constants/app_theme.dart';
 import 'presentation/screens/login_screen.dart';
 import 'presentation/providers/auth_provider.dart';
 import 'presentation/providers/student_data_provider.dart';
-import 'data/services/api_service.dart';
 
 final dio = Dio();
 
@@ -51,11 +51,19 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'College Academic App',
+        title: 'MANIT - Academic Portal',
         theme: AppTheme.lightTheme(),
         darkTheme: AppTheme.darkTheme(),
         themeMode: ThemeMode.system,
-        home: const LoginScreen(),
+        home: Consumer<AuthProvider>(
+        builder: (context, userProv, _) {
+          if (userProv.isAuthenticated) {
+            return const DashboardScreen();
+          } else {
+            return const LoginScreen();
+          }
+        },
+      ),
       ),
     );
   }
