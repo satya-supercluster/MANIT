@@ -10,6 +10,7 @@ class User {
   final int semester;
   final String? phoneNumber;
   final String enrollmentStatus;
+  final String program;
 
   User({
     required this.id,
@@ -23,6 +24,7 @@ class User {
     required this.semester,
     this.phoneNumber,
     required this.enrollmentStatus,
+    required this.program
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -38,6 +40,7 @@ class User {
       semester: json['semester'],
       phoneNumber: json['phone_number'],
       enrollmentStatus: json['enrollment_status'],
+      program: json['program'],
     );
   }
 
@@ -54,6 +57,7 @@ class User {
       'semester': semester,
       'phone_number': phoneNumber,
       'enrollment_status': enrollmentStatus,
+      'program':program,
     };
   }
 }

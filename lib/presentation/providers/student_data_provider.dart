@@ -17,7 +17,7 @@ class StudentDataProvider extends ChangeNotifier {
   Map<String, dynamic>? _scheduleData;
   List<dynamic>? _announcementsData;
   Map<String, dynamic>? _enrollmentData;
-  Map<String, dynamic>? _feeStatusData;
+  Map<String, dynamic>? _feeData;
 
   // Getters
   bool get isLoading => _isLoading;
@@ -28,7 +28,7 @@ class StudentDataProvider extends ChangeNotifier {
   Map<String, dynamic>? get scheduleData => _scheduleData;
   List<dynamic>? get announcementsData => _announcementsData;
   Map<String, dynamic>? get enrollmentData => _enrollmentData;
-  Map<String, dynamic>? get feeStatusData => _feeStatusData;
+  Map<String, dynamic>? get feeData => _feeData;
 
   // Reset state on logout
   void reset() {
@@ -37,7 +37,7 @@ class StudentDataProvider extends ChangeNotifier {
     _scheduleData = null;
     _announcementsData = null;
     _enrollmentData = null;
-    _feeStatusData = null;
+    _feeData = null;
     _hasError = false;
     _errorMessage = '';
     notifyListeners();
@@ -197,7 +197,7 @@ class StudentDataProvider extends ChangeNotifier {
       final response = await _apiService.getFeeStatus();
       
       if (response['success'] == true) {
-        _feeStatusData = response['data'];
+        _feeData = response['data'];
       } else {
         _hasError = true;
         _errorMessage = response['message'] ?? 'Failed to load fee status';
