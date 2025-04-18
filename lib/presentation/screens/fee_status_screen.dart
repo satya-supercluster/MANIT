@@ -17,7 +17,10 @@ class _FeeStatusScreenState extends State<FeeStatusScreen> {
   @override
   void initState() {
     super.initState();
-    _loadFeeData();
+    
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadFeeData();
+    });
   }
   
   Future<void> _loadFeeData() async {

@@ -40,14 +40,14 @@ class StudentDataProvider extends ChangeNotifier {
     _feeData = null;
     _hasError = false;
     _errorMessage = '';
-    // notifyListeners();
+    notifyListeners();
   }
 
   // Fetch profile information
   Future<void> fetchProfileData() async {
     _isLoading = true;
     _hasError = false;
-    // notifyListeners();
+    notifyListeners();
 
     try {
       final response = await _apiService.getStudentProfile();
@@ -64,14 +64,14 @@ class StudentDataProvider extends ChangeNotifier {
     }
 
     _isLoading = false;
-    // notifyListeners();
+    notifyListeners();
   }
 
   // Fetch profile Image information
   Future<void> fetchProfileImageData() async {
     _isLoading = true;
     _hasError = false;
-    // notifyListeners();
+    notifyListeners();
 
     try {
       final response = await _apiService.getStudentProfile();
@@ -88,14 +88,14 @@ class StudentDataProvider extends ChangeNotifier {
     }
 
     _isLoading = false;
-    // notifyListeners();
+    notifyListeners();
   }
 
   // Fetch grades
   Future<void> fetchGrades() async {
     _isLoading = true;
     _hasError = false;
-    // notifyListeners();
+    notifyListeners();
 
     try {
       final response = await _apiService.getResults();
@@ -112,14 +112,14 @@ class StudentDataProvider extends ChangeNotifier {
     }
 
     _isLoading = false;
-    // notifyListeners();
+    notifyListeners();
   }
 
   // Fetch course schedule
   Future<void> fetchSchedule() async {
     _isLoading = true;
     _hasError = false;
-    // notifyListeners();
+    notifyListeners();
 
     try {
       final response = await _apiService.getCourseSchedule();
@@ -136,14 +136,14 @@ class StudentDataProvider extends ChangeNotifier {
     }
 
     _isLoading = false;
-    // notifyListeners();
+    notifyListeners();
   }
 
   // Fetch announcements
   Future<void> fetchAnnouncements() async {
     _isLoading = true;
     _hasError = false;
-    // notifyListeners();
+    notifyListeners();
 
     try {
       final response = await _apiService.getAnnouncements();
@@ -160,14 +160,14 @@ class StudentDataProvider extends ChangeNotifier {
     }
 
     _isLoading = false;
-    // notifyListeners();
+    notifyListeners();
   }
 
   // Fetch enrollment info
   Future<void> fetchEnrollmentData() async {
     _isLoading = true;
     _hasError = false;
-    // notifyListeners();
+    notifyListeners();
 
     try {
       final response = await _apiService.getEnrollmentInfo();
@@ -184,14 +184,14 @@ class StudentDataProvider extends ChangeNotifier {
     }
 
     _isLoading = false;
-    // notifyListeners();
+    notifyListeners();
   }
 
   // Fetch fee status
   Future<void> fetchFeeStatus() async {
     _isLoading = true;
     _hasError = false;
-    // notifyListeners();
+    notifyListeners();
 
     try {
       final response = await _apiService.getFeeStatus();
@@ -208,6 +208,6 @@ class StudentDataProvider extends ChangeNotifier {
     }
 
     _isLoading = false;
-    // notifyListeners();
+    notifyListeners();
   }
 }

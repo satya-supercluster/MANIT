@@ -22,19 +22,20 @@ class ApiService {
   }
 
   // Login endpoint
-  Future<Map<String, dynamic>> login(String username, String password) async {
-    try {
-      final response = await dio.post(
-        '$baseUrl/login',
-        options: Options(headers: {'Content-Type': 'application/json'}),
-        data: jsonEncode({
-          'username': username,
-          'password': password,
-        }),
-      );
-      if (response.statusCode == 200) {
-        return {'success': true, 'data': response.data};
-      } else if (response.statusCode == 401) {
+ Future<Map<String, dynamic>> login(String username, String password) async {
+  try {
+    // Step 1: Login to get authentication token and studentId
+    final loginResponse = await dio.post(
+      '$baseUrl/login',
+      options: Options(headers: {'Content-Type': 'application/json'}),
+      data: jsonEncode({
+        'username': username,
+        'password': password,
+      }),
+    );
+    
+    if (loginResponse.statusCode != 200) {
+      if (loginResponse.statusCode == 401) {
         return {
           'success': false,
           'message': 'Invalid username or password',
@@ -45,13 +46,100 @@ class ApiService {
           'message': 'Server error. Please try again later.',
         };
       }
-    } catch (e) {
+    }
+    // print(loginResponse);
+    // Extract authentication token and studentId from login response
+    final loginData = loginResponse.data;
+    final token = loginData['token']; // Assuming token is in the response
+    final studentId = loginData['userInfo']?['uid']; // Assuming studentId is in the response
+    if (token == null || studentId == null) {
       return {
         'success': false,
-        'message': 'Connection error. Please check your internet.',
+        'message': 'Authentication successful but missing required data',
       };
     }
+    
+    // Prepare headers with authentication token
+    final authHeaders = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+    
+    // Step 2: Get student profile information
+    final profileResponse = await dio.post(
+      '$baseUrl/student_profile_check',
+      options: Options(headers: authHeaders),
+      data: jsonEncode({
+        'uid': studentId,
+      }),
+    );
+    if (profileResponse.statusCode != 200) {
+      if (profileResponse.statusCode == 401) {
+        return {'success': false, 'message': 'Unauthorized access to profile data'};
+      } else {
+        return {'success': false, 'message': 'Failed to load profile data'};
+      }
+    }
+    // print(profileResponse);
+    final profileData = profileResponse.data;
+    
+    // Step 3: Get student profile image
+    final profileImageResponse = await dio.post(
+      '$baseUrl/student_profile',
+      options: Options(headers: authHeaders),
+      data: jsonEncode({
+        'uid': studentId,
+      }),
+    );
+    
+    if (profileImageResponse.statusCode != 200) {
+      if (profileImageResponse.statusCode == 401) {
+        return {'success': false, 'message': 'Unauthorized access to profile image'};
+      } else {
+        return {'success': false, 'message': 'Failed to load profile image'};
+      }
+    }
+    // print(profileImageResponse);
+    final profileImageData = profileImageResponse.data;
+    
+    // Step 5: Get result Data
+    final resultResponse = await dio.post(
+      '$baseUrl/student_result',
+      options: Options(headers: authHeaders),
+      data: jsonEncode({
+        'uid': studentId,
+      }),
+    );
+    
+    if (resultResponse.statusCode != 200) {
+      if (resultResponse.statusCode == 401) {
+        return {'success': false, 'message': 'Unauthorized access to result'};
+      } else {
+        return {'success': false, 'message': 'Failed to load result'};
+      }
+    }
+    // print(resultResponse);
+    final resultData = resultResponse.data;
+    
+    // Step 5: Combine all data and return a complete response
+    return {
+      'success': true,
+      'data': {
+        'loginData': loginData,
+        'profileData': profileData,
+        'profileImageData': profileImageData,
+        'resultData': resultData,
+      }
+    };
+    
+  } catch (e) {
+    return {
+      'success': false,
+      'message': 'Connection error. Please check your internet connection.',
+      'error': e.toString(),
+    };
   }
+}
 
   // Get student profile info
   Future<Map<String, dynamic>> getStudentProfile() async {

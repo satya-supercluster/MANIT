@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:manit/presentation/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 import '../providers/student_data_provider.dart';
 import '../../core/constants/app_theme.dart';
@@ -19,7 +18,10 @@ class _GradesScreenState extends State<GradesScreen> with SingleTickerProviderSt
   @override
   void initState() {
     super.initState();
-    _loadGradesData();
+    
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadGradesData();
+    });
   }
   
   @override

@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/student_data_provider.dart';
 import '../widgets/dashboard_card.dart';
+import '../widgets/custom_navigation_bar.dart';
+import '../widgets/custom_app_bar.dart'; // Import the new widget
 import '../../core/constants/app_theme.dart';
 import 'profile_screen.dart';
 import 'grades_screen.dart';
@@ -21,15 +23,14 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   bool _isLoading = true;
   int _selectedIndex = 0;
-  bool _hasLoadedData = false;
+  bool _hasNotifications = false;
 
   @override
   void initState() {
     super.initState();
-    if (!_hasLoadedData) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadData();
-      _hasLoadedData = true;
-    }
+    });
   }
   
   // Load initial data
@@ -45,6 +46,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
       studentDataProvider.fetchProfileData(),
       studentDataProvider.fetchAnnouncements(),
     ]);
+    
+    // Check if there are new announcements
+    final announcements = studentDataProvider.announcementsData;
+    if (announcements != null && announcements.isNotEmpty) {
+      setState(() {
+        _hasNotifications = true;
+      });
+    }
     
     setState(() {
       _isLoading = false;
@@ -64,36 +73,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
     // Navigate back to login screen
     Navigator.of(context).pushReplacementNamed('/login');
   }
+  
+  // Navigate to notifications
+  void _navigateToNotifications() {
+    setState(() {
+      _selectedIndex = 3; // Switch to Announcements tab
+      _hasNotifications = false; // Clear notification indicator
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
     final studentDataProvider = Provider.of<StudentDataProvider>(context);
     final theme = Theme.of(context);
-    final size = MediaQuery.of(context).size;
+    final user = authProvider.currentUser;
 
-    // Bottom navigation destinations
-    final List<NavigationDestination> destinations = [
-      const NavigationDestination(
-        icon: Icon(Icons.dashboard_outlined),
-        selectedIcon: Icon(Icons.dashboard),
-        label: 'Dashboard',
-      ),
-      const NavigationDestination(
-        icon: Icon(Icons.calendar_today_outlined),
-        selectedIcon: Icon(Icons.calendar_today),
-        label: 'Schedule',
-      ),
-      const NavigationDestination(
-        icon: Icon(Icons.person_outline),
-        selectedIcon: Icon(Icons.person),
-        label: 'Profile',
-      ),
-      const NavigationDestination(
-        icon: Icon(Icons.notifications_outlined),
-        selectedIcon: Icon(Icons.notifications),
-        label: 'Alerts',
-      ),
+    // List of screen titles that correspond to navigation destinations
+    final List<String> screenTitles = [
+      'Student Dashboard',
+      'Schedule',
+      'Profile',
+      'Alerts'
     ];
 
     // Main content screens
@@ -112,38 +113,47 @@ class _DashboardScreenState extends State<DashboardScreen> {
       }
     }
 
+    // Generate avatar text from user's name
+    String avatarText = 'S';
+    if (user?.name != null && user!.name.isNotEmpty) {
+      avatarText = user.name[0].toUpperCase();
+    }
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          _selectedIndex == 0 ? 'Student Dashboard' : destinations[_selectedIndex].label,
-          style: theme.textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        actions: [
+      appBar: CustomAppBar(
+        title: screenTitles[_selectedIndex],
+        onSignOut: _signOut,
+        showNotification: _hasNotifications && _selectedIndex != 3,
+        onNotificationTap: _navigateToNotifications,
+        avatarText: _selectedIndex == 0 ? avatarText : null,
+        avatarBackgroundColor: AppTheme.primaryColor.withOpacity(0.2),
+        additionalActions: _selectedIndex == 0 ? [
           IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: _signOut,
-            tooltip: 'Logout',
+            icon: const Icon(Icons.refresh),
+            color: Colors.white70,
+            onPressed: _loadData,
+            tooltip: 'Refresh data',
           ),
-        ],
+        ] : null,
       ),
       body: _isLoading && _selectedIndex == 0
           ? const Center(
               child: CircularProgressIndicator(),
             )
           : getBody(),
-      bottomNavigationBar: NavigationBar(
+      // Use the extracted CustomNavigationBar widget
+      bottomNavigationBar: CustomNavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: (index) {
           setState(() {
             _selectedIndex = index;
+            
+            // Clear notification indicator when navigating to announcements
+            if (index == 3) {
+              _hasNotifications = false;
+            }
           });
         },
-        destinations: destinations,
-        backgroundColor: theme.cardTheme.color,
-        elevation: 3,
-        labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
       ),
     );
   }
@@ -153,6 +163,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     StudentDataProvider studentDataProvider,
     AuthProvider authProvider,
   ) {
+    // Dashboard content implementation remains the same
     final theme = Theme.of(context);
     final user = authProvider.currentUser;
     final announcements = studentDataProvider.announcementsData;

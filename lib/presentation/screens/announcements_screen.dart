@@ -16,7 +16,10 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
   @override
   void initState() {
     super.initState();
-    _loadAnnouncements();
+    
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadAnnouncements();
+    });
   }
   
   Future<void> _loadAnnouncements() async {

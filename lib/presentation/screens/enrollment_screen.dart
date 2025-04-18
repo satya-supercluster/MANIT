@@ -17,7 +17,10 @@ class _EnrollmentScreenState extends State<EnrollmentScreen> {
   @override
   void initState() {
     super.initState();
-    _loadEnrollmentData();
+    
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadEnrollmentData();
+    });
   }
   
   Future<void> _loadEnrollmentData() async {

@@ -19,7 +19,10 @@ class _ScheduleScreenState extends State<ScheduleScreen> with SingleTickerProvid
   void initState() {
     super.initState();
     _tabController = TabController(length: _days.length, vsync: this);
-    _loadScheduleData();
+    
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadScheduleData();
+    });
   }
 
   @override
