@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_theme.dart';
+import 'package:flutter_floating_bottom_bar/flutter_floating_bottom_bar.dart';
 
 class CustomNavigationBar extends StatelessWidget {
   final int selectedIndex;
@@ -77,8 +78,8 @@ class CustomNavigationBar extends StatelessWidget {
                   width: 72,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: pillColor,
                     borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.white)
                   ),
                 ),
               ),

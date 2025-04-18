@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_floating_bottom_bar/flutter_floating_bottom_bar.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/student_data_provider.dart';
 import '../widgets/dashboard_card.dart';
-import '../widgets/custom_navigation_bar.dart';
 import '../widgets/custom_app_bar.dart';
 import '../../core/constants/app_theme.dart';
 import 'profile_screen.dart';
@@ -20,17 +20,41 @@ class DashboardScreen extends StatefulWidget {
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProviderStateMixin {
   bool _isLoading = true;
   int _selectedIndex = 0;
   bool _hasNotifications = false;
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
+    
+    _tabController = TabController(length: 4, vsync: this, initialIndex: 0);
+    
+    // Add listener to update _selectedIndex when tab changes
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging && _tabController.index != _selectedIndex) {
+        setState(() {
+          _selectedIndex = _tabController.index;
+          
+          // Clear notification indicator when navigating to announcements
+          if (_selectedIndex == 3) {
+            _hasNotifications = false;
+          }
+        });
+      }
+    });
+    
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadData();
     });
+  }
+  
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
   
   // Load initial data
@@ -78,6 +102,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void _navigateToNotifications() {
     setState(() {
       _selectedIndex = 3; // Switch to Announcements tab
+      _tabController.animateTo(3); // Animate to the announcements tab
       _hasNotifications = false; // Clear notification indicator
     });
   }
@@ -96,24 +121,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       'Profile',
       'Alerts'
     ];
-
-    // Main content screens
-    Widget getBody() {
-      switch (_selectedIndex) {
-        case 0:
-          return _buildDashboardContent(context, studentDataProvider, authProvider);
-        case 1:
-          return const ScheduleScreen();
-        case 2:
-          return const ProfileScreen();
-        case 3:
-          return const AnnouncementsScreen();
-        case 4:
-          return const AnnouncementsScreen();
-        default:
-          return _buildDashboardContent(context, studentDataProvider, authProvider);
-      }
-    }
 
     // Generate avatar text from user's name
     String avatarText = 'S';
@@ -138,24 +145,106 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ] : null,
       ),
-      body: _isLoading && _selectedIndex == 0
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : getBody(),
-      // Use the extracted CustomNavigationBar widget
-      bottomNavigationBar: CustomNavigationBar(
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: (index) {
-          setState(() {
-            _selectedIndex = index;
-            
-            // Clear notification indicator when navigating to announcements
-            if (index == 3) {
-              _hasNotifications = false;
-            }
-          });
-        },
+      body: BottomBar(
+        // The floating bottom bar
+        child: _buildBottomBarContent(),
+        // The main body content
+        body: (context, controller) => TabBarView(
+          controller: _tabController,
+          physics: const NeverScrollableScrollPhysics(), // Disable swipe between tabs
+          children: [
+            _isLoading ? 
+              const Center(child: CircularProgressIndicator()) : 
+              _buildDashboardContent(context, studentDataProvider, authProvider, controller),
+            const ScheduleScreen(),
+            const ProfileScreen(),
+            const AnnouncementsScreen(),
+          ],
+        ),
+        // Customizations for the floating bar
+        width: MediaQuery.of(context).size.width * 0.9,
+        borderRadius: BorderRadius.circular(20),
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.decelerate,
+        showIcon: true,
+        barColor: AppTheme.primaryColor,
+        start: 2,
+        end: 0,
+        offset: 10,
+        barAlignment: Alignment.bottomCenter,
+        iconHeight: 30,
+        iconWidth: 30,
+        reverse: false,
+        hideOnScroll: true,
+        scrollOpposite: false,
+        icon: (width, height) => Center(
+          child: Icon(
+            Icons.arrow_upward_rounded,
+            color: Colors.white,
+            size: width,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomBarContent() {
+    // Icons for the bottom bar - adjust as needed
+    final List<IconData> icons = [
+      Icons.dashboard_rounded,
+      Icons.calendar_month_rounded,
+      Icons.person_rounded,
+      Icons.notifications_rounded,
+    ];
+
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: List.generate(4, (index) {
+          return GestureDetector(
+            onTap: () {
+              setState(() {
+                _selectedIndex = index;
+                _tabController.animateTo(index);
+                if (index == 3) {
+                  _hasNotifications = false;
+                }
+              });
+            },
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: _selectedIndex == index 
+                  ? Colors.white.withOpacity(0.3)
+                  : Colors.transparent,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Stack(
+                children: [
+                  Icon(
+                    icons[index],
+                    color: Colors.white,
+                    size: 28,
+                  ),
+                  if (index == 3 && _hasNotifications)
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      child: Container(
+                        width: 10,
+                        height: 10,
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          );
+        }),
       ),
     );
   }
@@ -164,8 +253,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     BuildContext context, 
     StudentDataProvider studentDataProvider,
     AuthProvider authProvider,
+    ScrollController controller, // Added scroll controller from BottomBar
   ) {
-    // Dashboard content implementation remains the same
     final theme = Theme.of(context);
     final user = authProvider.currentUser;
     final announcements = studentDataProvider.announcementsData;
@@ -173,6 +262,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return RefreshIndicator(
       onRefresh: _loadData,
       child: ListView(
+        controller: controller, // Use the scroll controller from BottomBar
         padding: const EdgeInsets.all(16),
         children: [
           // Welcome Card
@@ -321,6 +411,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   onPressed: () {
                     setState(() {
                       _selectedIndex = 3; // Switch to Announcements tab
+                      _tabController.animateTo(3);
                     });
                   },
                   child: const Text('View All'),
@@ -430,6 +521,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 );
               },
             ),
+          
+          // Add some padding at the bottom for the floating bar
+          const SizedBox(height: 80),
         ],
       ),
     );
