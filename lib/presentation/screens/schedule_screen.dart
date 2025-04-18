@@ -56,22 +56,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> with SingleTickerProvid
     final studentDataProvider = Provider.of<StudentDataProvider>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Class Schedule',
-          style: theme.textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        bottom: TabBar(
-          controller: _tabController,
-          isScrollable: true,
-          tabs: _days.map((day) => Tab(text: day)).toList(),
-          labelColor: theme.colorScheme.primary,
-          unselectedLabelColor: theme.colorScheme.onSurface,
-          indicatorColor: theme.colorScheme.primary,
-        ),
-      ),
       body: RefreshIndicator(
         onRefresh: _loadScheduleData,
         child: _isLoading

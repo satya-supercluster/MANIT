@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:manit/presentation/widgets/profile_avatar.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
-import '../providers/student_data_provider.dart';
-import '../../core/constants/app_theme.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -12,280 +11,422 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  bool _isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadProfileData();
-    });
-  }
-
-  Future<void> _loadProfileData() async {
-    final studentDataProvider = Provider.of<StudentDataProvider>(context, listen: false);
-    
-    setState(() {
-      _isLoading = true;
-    });
-    
-    await studentDataProvider.fetchProfileData();
-    
-    setState(() {
-      _isLoading = false;
-    });
-  }
+  String _activeTab = 'personal';
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final studentDataProvider = Provider.of<StudentDataProvider>(context);
     final authProvider = Provider.of<AuthProvider>(context);
-    final user = authProvider.currentUser;
-    final profileData = studentDataProvider.profileData;
+    final userData = authProvider.currentUser;
+
+    if (userData == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
     return Scaffold(
-      body: RefreshIndicator(
-        onRefresh: _loadProfileData,
-        child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : studentDataProvider.hasError
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.error_outline,
-                          color: AppTheme.errorColor,
-                          size: 48,
+      body: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+          child: Column(
+            children: [
+              // Profile Header with Gradient
+              Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF3B82F6), Color(0xFF2563EB)],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                  borderRadius: BorderRadius.circular(16.0),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    children: [
+                      // Profile Image
+                      Container(
+                        width: 120,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withOpacity(0.2),
                         ),
-                        const SizedBox(height: 16),
-                        Text(
-                          studentDataProvider.errorMessage,
-                          style: TextStyle(color: AppTheme.errorColor),
-                        ),
-                        const SizedBox(height: 24),
-                        ElevatedButton(
-                          onPressed: _loadProfileData,
-                          child: const Text('Retry'),
-                        ),
-                      ],
-                    ),
-                  )
-                : CustomScrollView(
-                    slivers: [
-                      SliverAppBar(
-                        expandedHeight: 220,
-                        pinned: true,
-                        flexibleSpace: FlexibleSpaceBar(
-                          background: Container(
+                        child: Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Container(
                             decoration: BoxDecoration(
+                              shape: BoxShape.circle,
                               gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  AppTheme.primaryColor,
-                                  AppTheme.primaryDarkColor,
-                                ],
+                                colors: [Colors.white.withOpacity(0.8), Colors.white.withOpacity(0.4)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
                               ),
                             ),
-                            child: SafeArea(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  CircleAvatar(
-                                    radius: 50,
-                                    backgroundColor: Colors.white,
-                                    child: Text(
-                                      user?.name.isNotEmpty == true 
-                                        ? user!.name[0].toUpperCase() 
-                                        : 'S',
-                                      style: const TextStyle(
-                                        fontSize: 40,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppTheme.primaryColor,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    user?.name ?? 'Student',
-                                    style: theme.textTheme.headlineSmall?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                            child: ProfileAvatar(base64Image: userData.profilePicture)
                           ),
                         ),
                       ),
-                      SliverPadding(
-                        padding: const EdgeInsets.all(16),
-                        sliver: SliverList(
-                          delegate: SliverChildListDelegate([
-                            // Student Information Card
-                            _buildInfoCard(
-                              theme,
-                              title: 'Student Information',
-                              icon: Icons.school,
-                              children: [
-                                _buildInfoRow(theme, 'Student ID', user?.studentId ?? 'N/A'),
-                                _buildInfoRow(theme, 'Program', user?.program ?? 'N/A'),
-                                _buildInfoRow(theme, 'Year Level', profileData?['yearLevel'] ?? 'N/A'),
-                                _buildInfoRow(theme, 'Status', profileData?['status'] ?? 'Active'),
-                                _buildInfoRow(theme, 'Department', profileData?['department'] ?? 'N/A'),
-                              ],
-                            ),
-                            
-                            const SizedBox(height: 16),
-                            
-                            // Personal Information Card
-                            _buildInfoCard(
-                              theme,
-                              title: 'Personal Information',
-                              icon: Icons.person,
-                              children: [
-                                _buildInfoRow(theme, 'Email', profileData?['email'] ?? 'N/A'),
-                                _buildInfoRow(theme, 'Phone', profileData?['phone'] ?? 'N/A'),
-                                _buildInfoRow(theme, 'Date of Birth', profileData?['birthDate'] ?? 'N/A'),
-                                _buildInfoRow(theme, 'Gender', profileData?['gender'] ?? 'N/A'),
-                              ],
-                            ),
-                            
-                            const SizedBox(height: 16),
-                            
-                            // Address Information Card
-                            _buildInfoCard(
-                              theme,
-                              title: 'Address',
-                              icon: Icons.home,
-                              children: [
-                                _buildInfoRow(theme, 'Street', profileData?['address']?['street'] ?? 'N/A'),
-                                _buildInfoRow(theme, 'City', profileData?['address']?['city'] ?? 'N/A'),
-                                _buildInfoRow(theme, 'State', profileData?['address']?['state'] ?? 'N/A'),
-                                _buildInfoRow(theme, 'Postal Code', profileData?['address']?['postalCode'] ?? 'N/A'),
-                                _buildInfoRow(theme, 'Country', profileData?['address']?['country'] ?? 'N/A'),
-                              ],
-                            ),
-                            
-                            const SizedBox(height: 16),
-                            
-                            // Academic Record
-                            _buildInfoCard(
-                              theme,
-                              title: 'Academic Information',
-                              icon: Icons.assessment,
-                              children: [
-                                _buildInfoRow(theme, 'GPA', profileData?['gpa'] ?? 'N/A'),
-                                _buildInfoRow(theme, 'Credits Earned', profileData?['creditsEarned']?.toString() ?? 'N/A'),
-                                _buildInfoRow(theme, 'Expected Graduation', profileData?['expectedGraduation'] ?? 'N/A'),
-                              ],
-                            ),
-                            
-                            const SizedBox(height: 16),
-                            
-                            // Emergency Contact
-                            _buildInfoCard(
-                              theme,
-                              title: 'Emergency Contact',
-                              icon: Icons.emergency,
-                              children: [
-                                _buildInfoRow(theme, 'Name', profileData?['emergencyContact']?['name'] ?? 'N/A'),
-                                _buildInfoRow(theme, 'Relationship', profileData?['emergencyContact']?['relationship'] ?? 'N/A'),
-                                _buildInfoRow(theme, 'Phone', profileData?['emergencyContact']?['phone'] ?? 'N/A'),
-                              ],
-                            ),
-                            
-                            const SizedBox(height: 24),
-                            
-                            // Edit Profile Button
-                            ElevatedButton.icon(
-                              onPressed: () {
-                                // Navigate to edit profile screen
-                              },
-                              icon: const Icon(Icons.edit),
-                              label: const Text('Edit Profile'),
-                              style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 12),
-                              ),
-                            ),
-                          ]),
+                      const SizedBox(height: 16),
+                      
+                      // User Details
+                      Text(
+                        userData.name,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
                         ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        userData.department,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.9),
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      
+                      // Badges
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _buildBadge(Icons.numbers, userData.studentId),
+                          const SizedBox(width: 8),
+                          _buildBadge(Icons.calendar_today, userData.semester),
+                        ],
                       ),
                     ],
                   ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              
+              // Tab Navigation
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.2),
+                      spreadRadius: 1,
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _buildTabButton('personal', 'Personal', Icons.person),
+                      _buildTabButton('academic', 'Academic', Icons.school),
+                      _buildTabButton('family', 'Family', Icons.family_restroom),
+                      _buildTabButton('contact', 'Contact', Icons.phone),
+                      _buildTabButton('documents', 'Documents', Icons.description),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              
+              // Content based on active tab
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.2),
+                      spreadRadius: 1,
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                padding: const EdgeInsets.all(20),
+                child: _buildTabContent(userData),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildInfoCard(
-    ThemeData theme, {
-    required String title,
-    required IconData icon,
-    required List<Widget> children,
-  }) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+  Widget _buildBadge(IconData icon, String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(30),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(
-                  icon,
-                  color: AppTheme.primaryColor,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  title,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: Colors.white),
+          const SizedBox(width: 4),
+          Text(
+            text,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
             ),
-            const Divider(height: 24),
-            ...children,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTabButton(String tab, String label, IconData icon) {
+    bool isActive = _activeTab == tab;
+    
+    return InkWell(
+      onTap: () {
+        setState(() {
+          _activeTab = tab;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+        decoration: BoxDecoration(
+          border: isActive
+              ? const Border(
+                  bottom: BorderSide(
+                    color: Color(0xFF4F46E5),
+                    width: 2.0,
+                  ),
+                )
+              : null,
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: 20,
+              color: isActive ? const Color(0xFF4F46E5) : Colors.grey,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                color: isActive ? const Color(0xFF4F46E5) : Colors.grey,
+                fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildInfoRow(ThemeData theme, String label, String value) {
+  Widget _buildTabContent(user) {
+    switch (_activeTab) {
+      case 'personal':
+        return _buildPersonalInfo(user);
+      case 'academic':
+        return _buildAcademicInfo(user);
+      case 'family':
+        return _buildFamilyInfo(user);
+      case 'contact':
+        return _buildContactInfo(user);
+      case 'documents':
+        return _buildDocumentsInfo(user);
+      default:
+        return _buildPersonalInfo(user);
+    }
+  }
+
+  Widget _buildInfoItem(IconData icon, String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 120,
-            child: Text(
-              label,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+          Icon(
+            icon,
+            size: 20,
+            color: const Color(0xFF4F46E5),
           ),
+          const SizedBox(width: 12),
           Expanded(
-            child: Text(
-              value,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF1F2937),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16, top: 8),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          color: Color(0xFF4F46E5),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPersonalInfo(user) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Personal Information',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey.shade800,
+          ),
+        ),
+        const Divider(height: 32),
+        GridView.count(
+          crossAxisCount: 2,
+          shrinkWrap: true,
+          childAspectRatio: 2.5,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 8,
+          children: [
+            _buildInfoItem(Icons.person, 'Full Name', user.fullName),
+            _buildInfoItem(Icons.calendar_today, 'Date of Birth', user.dateOfBirth ?? 'N/A'),
+            _buildInfoItem(Icons.favorite, 'Marital Status', user.maritalStatus ?? 'N/A'),
+            _buildInfoItem(Icons.public, 'Nationality', user.nationality ?? 'N/A'),
+            _buildInfoItem(Icons.local_hospital, 'Blood Group', user.bloodGroup ?? 'N/A'),
+            _buildInfoItem(Icons.language, 'Mother Tongue', user.motherTongue ?? 'N/A'),
+            _buildInfoItem(Icons.people, 'Caste', user.caste ?? 'N/A'),
+            _buildInfoItem(Icons.person_outline, 'Gender', user.gender ?? 'N/A'),
+            _buildInfoItem(Icons.home, 'Hostel', user.hostel ?? 'N/A'),
+            _buildInfoItem(Icons.hotel, 'Room No', user.roomNo ?? 'N/A'),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAcademicInfo(user) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Academic Information',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey.shade800,
+          ),
+        ),
+        const Divider(height: 32),
+        _buildInfoItem(Icons.school, 'Department', user.department),
+        _buildInfoItem(Icons.numbers, 'Student ID', user.studentId),
+        _buildInfoItem(Icons.calendar_today, 'Current Semester', user.semester),
+        _buildInfoItem(Icons.calendar_month, 'Batch', user.batch),
+        _buildInfoItem(Icons.how_to_reg, 'Enrollment Status', user.enrollmentStatus),
+        _buildInfoItem(Icons.grade, 'Program', user.program),
+      ],
+    );
+  }
+
+  Widget _buildFamilyInfo(user) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Family Information',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey.shade800,
+          ),
+        ),
+        const Divider(height: 32),
+        _buildSectionTitle('Parents'),
+        _buildInfoItem(Icons.person, 'Father\'s Name', user.fatherName ?? 'N/A'),
+        _buildInfoItem(Icons.work, 'Father\'s Profession', user.fatherProfession ?? 'N/A'),
+        _buildInfoItem(Icons.person, 'Mother\'s Name', user.motherName ?? 'N/A'),
+        _buildInfoItem(Icons.work, 'Mother\'s Profession', user.motherProfession ?? 'N/A'),
+        _buildInfoItem(Icons.location_on, 'Parents\' Address', user.parentsAddress ?? 'N/A'),
+        _buildInfoItem(Icons.phone, 'Parents\' Phone', user.parentsPhone ?? 'N/A'),
+        _buildInfoItem(Icons.email, 'Parents\' Email', user.parentsEmail ?? 'N/A'),
+        
+        const SizedBox(height: 16),
+        _buildSectionTitle('Guardian'),
+        _buildInfoItem(Icons.person, 'Guardian\'s Name', user.guardianName ?? 'N/A'),
+        _buildInfoItem(Icons.people, 'Relationship with Guardian', user.relationshipWithGuardian ?? 'N/A'),
+        _buildInfoItem(Icons.location_on, 'Guardian\'s Address', user.guardianAddress ?? 'N/A'),
+        _buildInfoItem(Icons.phone, 'Guardian\'s Phone', user.guardianPhone ?? 'N/A'),
+        _buildInfoItem(Icons.email, 'Guardian\'s Email', user.guardianEmail ?? 'N/A'),
+      ],
+    );
+  }
+
+  Widget _buildContactInfo(user) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Contact Information',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey.shade800,
+          ),
+        ),
+        const Divider(height: 32),
+        _buildInfoItem(Icons.phone, 'Phone Number', user.phoneNumber ?? 'N/A'),
+        _buildInfoItem(Icons.phone_android, 'Alternate Phone Number', user.alternatePhoneNumber ?? 'N/A'),
+        _buildInfoItem(Icons.email, 'Email ID', user.email),
+        _buildInfoItem(Icons.alternate_email, 'Alternate Email ID', user.alternateEmailId ?? 'N/A'),
+        _buildInfoItem(Icons.home, 'Permanent Address', user.permanentAddress ?? 'N/A'),
+        _buildInfoItem(Icons.location_on, 'Present Address', user.presentAddress ?? 'N/A'),
+      ],
+    );
+  }
+
+  Widget _buildDocumentsInfo(user) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Documents & Identification',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey.shade800,
+          ),
+        ),
+        const Divider(height: 32),
+        _buildInfoItem(Icons.credit_card, 'Aadhar Number', user.aadharNumber ?? 'N/A'),
+        _buildInfoItem(Icons.book, 'Passport Number', user.passportNumber ?? 'N/A'),
+        _buildInfoItem(Icons.credit_card, 'PAN Number', user.panNumber ?? 'N/A'),
+        _buildInfoItem(Icons.description, 'ABC ID', user.abcId ?? 'N/A'),
+        _buildInfoItem(Icons.how_to_vote, 'Voter Card', user.voterCard ?? 'N/A'),
+      ],
     );
   }
 }

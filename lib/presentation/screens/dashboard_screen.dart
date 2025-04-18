@@ -108,6 +108,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           return const ProfileScreen();
         case 3:
           return const AnnouncementsScreen();
+        case 4:
+          return const AnnouncementsScreen();
         default:
           return _buildDashboardContent(context, studentDataProvider, authProvider);
       }
