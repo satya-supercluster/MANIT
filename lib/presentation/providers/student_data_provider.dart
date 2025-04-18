@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../data/services/api_service.dart';
+import '../../data/repositories/transform_result_data_format.dart';
 
 class StudentDataProvider extends ChangeNotifier {
 
@@ -12,8 +13,7 @@ class StudentDataProvider extends ChangeNotifier {
   String _errorMessage = '';
 
   // Student profile data
-  Map<String, dynamic>? _profileData;
-  Map<String, dynamic>? _gradesData;
+  Map<String, dynamic>? _resultData;
   Map<String, dynamic>? _scheduleData;
   List<dynamic>? _announcementsData;
   Map<String, dynamic>? _enrollmentData;
@@ -23,8 +23,7 @@ class StudentDataProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   bool get hasError => _hasError;
   String get errorMessage => _errorMessage;
-  Map<String, dynamic>? get profileData => _profileData;
-  Map<String, dynamic>? get gradesData => _gradesData;
+  Map<String, dynamic>? get resultData => _resultData;
   Map<String, dynamic>? get scheduleData => _scheduleData;
   List<dynamic>? get announcementsData => _announcementsData;
   Map<String, dynamic>? get enrollmentData => _enrollmentData;
@@ -32,8 +31,7 @@ class StudentDataProvider extends ChangeNotifier {
 
   // Reset state on logout
   void reset() {
-    _profileData = null;
-    _gradesData = null;
+    _resultData = null;
     _scheduleData = null;
     _announcementsData = null;
     _enrollmentData = null;
@@ -43,68 +41,23 @@ class StudentDataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Fetch profile information
-  Future<void> fetchProfileData() async {
+  // Fetch Result
+  Future<void> fetchResult(String studentId) async {
     _isLoading = true;
     _hasError = false;
     notifyListeners();
 
     try {
-      final response = await _apiService.getStudentProfile();
+      final response = await _apiService.getResults(studentId);
       
       if (response['success'] == true) {
-        _profileData = response['data'];
+        print(response['data']);
+        _resultData = transformResultDataFormat(response['data']);
+        print(_resultData);
+        _hasError = false;
       } else {
         _hasError = true;
-        _errorMessage = response['message'] ?? 'Failed to load profile data';
-      }
-    } catch (e) {
-      _hasError = true;
-      _errorMessage = 'Connection error. Please check your internet.';
-    }
-
-    _isLoading = false;
-    notifyListeners();
-  }
-
-  // Fetch profile Image information
-  Future<void> fetchProfileImageData() async {
-    _isLoading = true;
-    _hasError = false;
-    notifyListeners();
-
-    try {
-      final response = await _apiService.getStudentProfile();
-      
-      if (response['success'] == true) {
-        _profileData = response['data'];
-      } else {
-        _hasError = true;
-        _errorMessage = response['message'] ?? 'Failed to load profile data';
-      }
-    } catch (e) {
-      _hasError = true;
-      _errorMessage = 'Connection error. Please check your internet.';
-    }
-
-    _isLoading = false;
-    notifyListeners();
-  }
-
-  // Fetch grades
-  Future<void> fetchGrades() async {
-    _isLoading = true;
-    _hasError = false;
-    notifyListeners();
-
-    try {
-      final response = await _apiService.getResults();
-      
-      if (response['success'] == true) {
-        _gradesData = response['data'];
-      } else {
-        _hasError = true;
-        _errorMessage = response['message'] ?? 'Failed to load grades';
+        _errorMessage = response['message'] ?? 'Failed to load result';
       }
     } catch (e) {
       _hasError = true;

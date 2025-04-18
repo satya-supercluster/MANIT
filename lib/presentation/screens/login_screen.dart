@@ -44,40 +44,42 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   }
 
   void _login() async {
-  if (_formKey.currentState!.validate()) {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final success = await authProvider.login(
-      _usernameController.text.trim(),
-      _passwordController.text,
-    );
+    if (_formKey.currentState!.validate()) {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final success = await authProvider.login(
+        _usernameController.text.trim(),
+        _passwordController.text,
+      );
 
-    if (success) {
-      // Navigate to DashboardScreen and replace LoginScreen
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const DashboardScreen()),
-      );
-    } else {
-      // Optional: Show error using a snackbar or dialog
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login failed. Please try again.')),
-      );
+      if (success && mounted) {
+        // Navigate to DashboardScreen and replace LoginScreen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const DashboardScreen()),
+        );
+      } else if (mounted) {
+        // Optional: Show error using a snackbar or dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Login failed. Please try again.')),
+        );
+      }
     }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
     final theme = Theme.of(context);
     final authProvider = Provider.of<AuthProvider>(context);
 
     return Scaffold(
+      // Enable resize to handle keyboard properly
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Container(
-            height: size.height - MediaQuery.of(context).padding.top,
+          // Better keyboard handling with physics
+          physics: const ClampingScrollPhysics(),
+          // Removed fixed height container that was causing constraint issues
+          child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -342,7 +344,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     ],
                   ),
                 ),
-                const Spacer(),
+                const SizedBox(height: 32),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 16.0),
                   child: Text(

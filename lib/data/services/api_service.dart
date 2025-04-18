@@ -129,7 +129,8 @@ class ApiService {
         'profileData': profileData,
         'profileImageData': profileImageData,
         'resultData': resultData,
-      }
+      },
+      'token':token
     };
     
   } catch (e) {
@@ -144,9 +145,10 @@ class ApiService {
   // Get student profile info
   Future<Map<String, dynamic>> getStudentProfile() async {
     try {
+      final headers=await _getHeaders();
       final response = await dio.get(
         '$baseUrl/student_profile_check',
-        options: Options(headers: await _getHeaders()),
+        options: Options(headers: headers),
       );
       if (response.statusCode == 200) {
         return {'success': true, 'data': response.data};
@@ -181,20 +183,27 @@ class ApiService {
   }
 
   // Get Results with GPA
-  Future<Map<String, dynamic>> getResults() async {
+  Future<Map<String, dynamic>> getResults(String studentId) async {
     try {
-      final response = await dio.get(
+      // print(studentId);
+      final headers=await _getHeaders();
+      // print(headers);
+      final response = await dio.post(
         '$baseUrl/student_result',
-        options: Options(headers: await _getHeaders()),
+        options: Options(headers:headers),
+        data: jsonEncode({
+          'uid': studentId,
+        }),
       );
-
+      // print(response);
       if (response.statusCode == 200) {
         return {'success': true, 'data': response.data};
       } else {
         return {'success': false, 'message': 'Failed to load grades'};
       }
     } catch (e) {
-      return {'success': false, 'message': 'Connection error'};
+      // print(e);
+      return {'success': false, 'message': 'Connection error $e'};
     }
   }
 

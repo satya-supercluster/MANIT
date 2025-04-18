@@ -3,7 +3,7 @@ import '../../core/constants/app_theme.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
-  final VoidCallback onSignOut;
+  final VoidCallback? onSignOut;
   final bool showNotification;
   final VoidCallback? onNotificationTap;
   final String? avatarText;
@@ -13,7 +13,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppBar({
     super.key,
     required this.title,
-    required this.onSignOut,
+    this.onSignOut,
     this.showNotification = false,
     this.onNotificationTap,
     this.avatarText,

@@ -7,7 +7,7 @@ import '../widgets/dashboard_card.dart';
 import '../widgets/custom_app_bar.dart';
 import '../../core/constants/app_theme.dart';
 import 'profile_screen.dart';
-import 'grades_screen.dart';
+import 'result_screen.dart';
 import 'schedule_screen.dart';
 import 'announcements_screen.dart';
 import 'enrollment_screen.dart';
@@ -67,7 +67,6 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
     
     // Load profile and announcements data on dashboard load
     await Future.wait([
-      studentDataProvider.fetchProfileData(),
       studentDataProvider.fetchAnnouncements(),
     ]);
     
@@ -136,14 +135,6 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
         onNotificationTap: _navigateToNotifications,
         avatarText: _selectedIndex == 0 ? avatarText : null,
         avatarBackgroundColor: AppTheme.primaryColor.withOpacity(0.2),
-        additionalActions: _selectedIndex == 0 ? [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            color: Colors.white70,
-            onPressed: _loadData,
-            tooltip: 'Refresh data',
-          ),
-        ] : null,
       ),
       body: BottomBar(
         // The floating bottom bar
@@ -189,7 +180,7 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
   }
 
   Widget _buildBottomBarContent() {
-    // Icons for the bottom bar - adjust as needed
+
     final List<IconData> icons = [
       Icons.dashboard_rounded,
       Icons.calendar_month_rounded,
@@ -349,13 +340,13 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
             physics: const NeverScrollableScrollPhysics(),
             children: [
               DashboardCard(
-                title: 'Grades',
+                title: 'Result',
                 icon: Icons.grading_rounded,
                 color: AppTheme.primaryColor,
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const GradesScreen()),
+                    MaterialPageRoute(builder: (_) => const ResultScreen()),
                   );
                 },
               ),
