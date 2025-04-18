@@ -4,7 +4,7 @@ import '../providers/auth_provider.dart';
 import '../providers/student_data_provider.dart';
 import '../widgets/dashboard_card.dart';
 import '../widgets/custom_navigation_bar.dart';
-import '../widgets/custom_app_bar.dart'; // Import the new widget
+import '../widgets/custom_app_bar.dart';
 import '../../core/constants/app_theme.dart';
 import 'profile_screen.dart';
 import 'grades_screen.dart';

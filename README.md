@@ -1,4 +1,4 @@
-# manit
+# MANIT
 
 Application for MANIT students
 
