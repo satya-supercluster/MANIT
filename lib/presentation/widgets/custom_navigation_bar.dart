@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_theme.dart';
-import 'package:flutter_floating_bottom_bar/flutter_floating_bottom_bar.dart';
 
 class CustomNavigationBar extends StatelessWidget {
   final int selectedIndex;
@@ -8,11 +7,11 @@ class CustomNavigationBar extends StatelessWidget {
   final Gradient? backgroundGradient;
 
   const CustomNavigationBar({
-    Key? key,
+    super.key,
     required this.selectedIndex,
     required this.onDestinationSelected,
     this.backgroundGradient,
-  }) : super(key: key);
+  });
 
   static const _icons = [
     Icons.home_outlined,

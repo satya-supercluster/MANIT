@@ -4,7 +4,9 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final ScrollController scrollController;
+  const ProfileScreen({super.key, required this.scrollController});
+  
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -23,8 +25,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Container(
+      body: ListView(
+        controller: widget.scrollController,
+        children: [Container(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
           child: Column(
             children: [
@@ -147,9 +150,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 padding: const EdgeInsets.all(20),
                 child: _buildTabContent(userData),
               ),
+              SizedBox(height: 80,)
             ],
           ),
-        ),
+        ),]
       ),
     );
   }

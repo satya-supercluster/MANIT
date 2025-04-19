@@ -89,18 +89,34 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                   opacity: _fadeAnimation,
                   child: Column(
                     children: [
-                      Container(
-                        height: 80,
-                        width: 80,
-                        decoration: BoxDecoration(
-                          color: AppTheme.primaryColor.withOpacity(0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.school_rounded,
-                          size: 42,
-                          color: AppTheme.primaryColor,
-                        ),
+                      // New Row with Logo, Dashed Line and Education Icon
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Logo Image
+                          Image.asset(
+                            'assets/images/manit_logo.png',
+                            height: 60,
+                            width: 60,
+                          ),
+                          
+                          // Dashed Line
+                          Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 16),
+                            height: 40,
+                            child: CustomPaint(
+                              size: const Size(2, 40),
+                              painter: DashedLinePainter(),
+                            ),
+                          ),
+                          
+                          // Education Icon
+                          Icon(
+                            Icons.school_rounded,
+                            size: 70,
+                            color: AppTheme.primaryColor,
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 24),
                       Text(
@@ -348,7 +364,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                 Padding(
                   padding: const EdgeInsets.only(bottom: 16.0),
                   child: Text(
-                    '© 2025 College Academic Portal. All rights reserved.',
+                    '© 2025 MANIT Academic Portal. All rights reserved.',
                     style: TextStyle(
                       color: Colors.grey.shade600,
                       fontSize: 12,
@@ -363,4 +379,35 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       ),
     );
   }
+}
+
+// Custom painter for the dashed line
+class DashedLinePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.grey.shade400
+      ..strokeWidth = 1.5
+      ..style = PaintingStyle.stroke;
+
+    final dashWidth = 4;
+    final dashSpace = 4;
+    double startY = 0;
+    final double endY = size.height;
+
+    // Draw dashed line
+    while (startY < endY) {
+      // Draw a dash
+      canvas.drawLine(
+        Offset(0, startY),
+        Offset(0, startY + dashWidth),
+        paint,
+      );
+      // Skip a space
+      startY += dashWidth + dashSpace;
+    }
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }

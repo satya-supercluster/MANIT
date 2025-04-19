@@ -6,6 +6,7 @@ class User {
   final String? profilePicture;
   final String studentId;
   final String department;
+  final String degree;
   final String batch;
   final String semester;
   final String? phoneNumber;
@@ -62,6 +63,7 @@ class User {
     this.profilePicture,
     required this.studentId,
     required this.department,
+    required this.degree,
     required this.batch,
     required this.semester,
     this.phoneNumber,
@@ -108,6 +110,7 @@ class User {
       profilePicture: json['profileImageData']?['image'].toString()??"N/A",
       studentId: json['profileData']?['roll_no']?.toString() ?? 'N/A',
       department: json['loginData']?['userInfo']?['departmentNumber']?.toString() ?? 'N/A',
+      degree: json['loginData']?['userInfo']?['studentInfo'][0]?['code_desc'].toString() ?? 'N/A',
       batch: json['loginData']?['userInfo']?['studentInfo'][0]?['start_session']?.toString()??"N/A",
       semester: "Semester ${json['resultData']?['data']?['FINAL_CGPA']?.length + 1}",
       phoneNumber: json['profileData']?['phone_number']?.toString(),
@@ -181,6 +184,7 @@ class User {
       'profile_picture': profilePicture,
       'student_id': studentId,
       'department': department,
+      'degree': degree,
       'batch': batch,
       'semester': semester,
       'phone_number': phoneNumber,

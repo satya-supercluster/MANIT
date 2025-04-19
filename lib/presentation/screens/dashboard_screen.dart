@@ -116,8 +116,8 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
     // List of screen titles that correspond to navigation destinations
     final List<String> screenTitles = [
       'Student Dashboard',
-      'Schedule',
       'Profile',
+      'Schedule',
       'Alerts'
     ];
 
@@ -137,9 +137,6 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
         avatarBackgroundColor: AppTheme.primaryColor.withOpacity(0.2),
       ),
       body: BottomBar(
-        // The floating bottom bar
-        child: _buildBottomBarContent(),
-        // The main body content
         body: (context, controller) => TabBarView(
           controller: _tabController,
           physics: const NeverScrollableScrollPhysics(), // Disable swipe between tabs
@@ -147,8 +144,8 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
             _isLoading ? 
               const Center(child: CircularProgressIndicator()) : 
               _buildDashboardContent(context, studentDataProvider, authProvider, controller),
+            ProfileScreen(scrollController: controller),
             const ScheduleScreen(),
-            const ProfileScreen(),
             const AnnouncementsScreen(),
           ],
         ),
@@ -175,6 +172,8 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
             size: width,
           ),
         ),
+        // The floating bottom bar
+        child: _buildBottomBarContent(),
       ),
     );
   }
@@ -183,8 +182,8 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
 
     final List<IconData> icons = [
       Icons.dashboard_rounded,
-      Icons.calendar_month_rounded,
       Icons.person_rounded,
+      Icons.calendar_month_rounded,
       Icons.notifications_rounded,
     ];
 
@@ -310,6 +309,12 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
                     'Student ID: ${user?.studentId ?? 'N/A'}',
                     style: theme.textTheme.bodyLarge,
                   ),
+                  const SizedBox(height: 8),
+                  if (user?.degree != null)
+                    Text(
+                      'Degree: ${user?.degree}',
+                      style: theme.textTheme.bodyLarge,
+                    ),
                   const SizedBox(height: 8),
                   if (user?.program != null)
                     Text(
