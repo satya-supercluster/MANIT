@@ -111,25 +111,28 @@ class _ResultScreenState extends State<ResultScreen> with SingleTickerProviderSt
             ? const Center(child: CircularProgressIndicator())
             : studentDataProvider.hasError
                 ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.error_outline,
-                          color: AppTheme.errorColor,
-                          size: 48,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          studentDataProvider.errorMessage,
-                          style: TextStyle(color: AppTheme.errorColor),
-                        ),
-                        const SizedBox(height: 24),
-                        ElevatedButton(
-                          onPressed: _loadResultData,
-                          child: const Text('Retry'),
-                        ),
-                      ],
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.error_outline,
+                            color: AppTheme.errorColor,
+                            size: 48,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            studentDataProvider.errorMessage,
+                            style: TextStyle(color: AppTheme.errorColor),
+                          ),
+                          const SizedBox(height: 24),
+                          ElevatedButton(
+                            onPressed: _loadResultData,
+                            child: const Text('Retry'),
+                          ),
+                        ],
+                      ),
                     ),
                   )
                 : resultData == null || resultData['data'] == null || 

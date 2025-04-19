@@ -57,7 +57,8 @@ class StudentDataProvider extends ChangeNotifier {
         _hasError = false;
       } else {
         _hasError = true;
-        _errorMessage = response['message'] ?? 'Failed to load result';
+        // _errorMessage = response['message'] ?? 'Failed to load result';
+        _errorMessage = 'Failed to load result';
       }
     } catch (e) {
       _hasError = true;
