@@ -100,6 +100,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> with SingleTickerProvid
     );
   }
 
+  
   Widget _buildDaySchedule(String day, StudentDataProvider provider) {
     // For demonstration, using mock data structure
     // In a real scenario, this would come from the provider
@@ -274,5 +275,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> with SingleTickerProvid
         ),
       ),
     );
+    
   }
+  
 }
+

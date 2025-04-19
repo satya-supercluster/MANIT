@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:manit/data/repositories/transform_fee_data_format.dart';
 import '../../data/services/api_service.dart';
 import '../../data/repositories/transform_result_data_format.dart';
 
@@ -51,9 +52,9 @@ class StudentDataProvider extends ChangeNotifier {
       final response = await _apiService.getResults(studentId);
       
       if (response['success'] == true) {
-        print(response['data']);
+        // print(response['data']);
         _resultData = transformResultDataFormat(response['data']);
-        print(_resultData);
+        // print(_resultData);
         _hasError = false;
       } else {
         _hasError = true;
@@ -141,20 +142,21 @@ class StudentDataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Fetch fee status
-  Future<void> fetchFeeStatus() async {
+  // Fetch fee data
+  Future<void> fetchFeeData(String program, String id) async {
     _isLoading = true;
     _hasError = false;
     notifyListeners();
 
     try {
-      final response = await _apiService.getFeeStatus();
+      final response = await _apiService.getFeeData(program,id);
       
       if (response['success'] == true) {
-        _feeData = response['data'];
+        _feeData = transformFeeDataFormat(response['data']);
       } else {
         _hasError = true;
-        _errorMessage = response['message'] ?? 'Failed to load fee status';
+        _errorMessage = response['message'] ?? 'Failed to load fee data';
+        // _errorMessage ='Failed to load fee data';
       }
     } catch (e) {
       _hasError = true;

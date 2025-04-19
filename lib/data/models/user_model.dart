@@ -14,6 +14,7 @@ class User {
   final String? alternateEmailId;
   final String enrollmentStatus;
   final String program;
+  final String programMasterId;
   
   // Personal information
   final String? dateOfBirth;
@@ -71,6 +72,7 @@ class User {
     this.alternateEmailId,
     required this.enrollmentStatus,
     required this.program,
+    required this.programMasterId,
     this.dateOfBirth,
     this.maritalStatus,
     this.nationality,
@@ -118,6 +120,7 @@ class User {
       alternateEmailId: json['profileData']?['alternate_email']?.toString(),
       enrollmentStatus: json['enrollment_status']?.toString() ?? 'Active',
       program: json['loginData']?['userInfo']?['departmentNumber']?.toString() ?? 'N/A',
+      programMasterId: json['loginData']?['userInfo']?['studentInfo'][0]?['program_master_id'].toString() ?? 'N/A',
       dateOfBirth: json['loginData']?['userInfo']?['studentInfo'][0]?['dob']?.toString(),
       maritalStatus: json['profileData']?['marital_status']?.toString() ?? 'N/A',
       nationality: json['profileData']?['perm_country']?.toString() ?? "N/A",
@@ -192,6 +195,7 @@ class User {
       'alternate_email_id': alternateEmailId,
       'enrollment_status': enrollmentStatus,
       'program': program,
+      'program_master_id': programMasterId,
       'date_of_birth': dateOfBirth,
       'marital_status': maritalStatus,
       'nationality': nationality,

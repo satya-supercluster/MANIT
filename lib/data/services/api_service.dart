@@ -262,11 +262,17 @@ class ApiService {
   }
   
   // Get fee status
-  Future<Map<String, dynamic>> getFeeStatus() async {
+  Future<Map<String, dynamic>> getFeeData(String program,String id) async {
     try {
-      final response = await dio.get(
-        '$baseUrl/student/fee-status',
-        options: Options(headers: await _getHeaders()),
+      final headers=await _getHeaders();
+      // print(headers);
+      final response = await dio.post(
+        '$baseUrl/student_fees',
+        options: Options(headers:headers),
+        data: jsonEncode({
+          'program': program,
+          'studentuid': id
+        }),
       );
 
       if (response.statusCode == 200) {

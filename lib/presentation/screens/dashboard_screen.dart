@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_floating_bottom_bar/flutter_floating_bottom_bar.dart';
+import 'package:manit/presentation/screens/academic_performance_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/student_data_provider.dart';
@@ -11,7 +12,7 @@ import 'result_screen.dart';
 import 'schedule_screen.dart';
 import 'announcements_screen.dart';
 import 'enrollment_screen.dart';
-import 'fee_status_screen.dart';
+import 'fees_account_section_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -356,13 +357,13 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
                 },
               ),
               DashboardCard(
-                title: 'Schedule',
-                icon: Icons.calendar_month_rounded,
+                title: 'Performance',
+                icon: Icons.grade_rounded,
                 color: AppTheme.accentColor,
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const ScheduleScreen()),
+                    MaterialPageRoute(builder: (_) => const AcademicPerformanceScreen()),
                   );
                 },
               ),
@@ -378,13 +379,13 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
                 },
               ),
               DashboardCard(
-                title: 'Fee Status',
+                title: 'Fee Info',
                 icon: Icons.account_balance_wallet_rounded,
                 color: AppTheme.warningColor,
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const FeeStatusScreen()),
+                    MaterialPageRoute(builder: (_) => const FeesAccountSectionScreen()),
                   );
                 },
               ),
