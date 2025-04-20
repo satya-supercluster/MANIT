@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:manit/presentation/widgets/custom_load_widget.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/student_data_provider.dart';
@@ -108,7 +109,7 @@ class _ResultScreenState extends State<ResultScreen> with SingleTickerProviderSt
       body: RefreshIndicator(
         onRefresh: _loadResultData,
         child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
+            ? const CustomLoadWidget()
             : studentDataProvider.hasError
                 ? Center(
                     child: Padding(

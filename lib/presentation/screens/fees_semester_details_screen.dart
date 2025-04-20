@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:manit/data/repositories/transform_fee_data_format.dart';
 import 'package:manit/presentation/providers/student_data_provider.dart';
+import 'package:manit/presentation/widgets/custom_load_widget.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:pdf/pdf.dart';
@@ -415,16 +416,7 @@ class _FeesSemesterDetailsScreenState extends State<FeesSemesterDetailsScreen> {
         ],
       ),
       body: _isGeneratingPdf
-          ? const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text('Generating PDF...'),
-                ],
-              ),
-            )
+          ? CustomLoadWidget()
           : SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -481,7 +473,7 @@ class _FeesSemesterDetailsScreenState extends State<FeesSemesterDetailsScreen> {
     );
   }
 
-  Widget _buildStudentDetailsTable(Map<String, dynamic> user) {
+  Widget _buildStudentDetailsTable(Map<dynamic, dynamic> user) {
     return Table(
       border: TableBorder.all(color: Colors.grey.shade300),
       columnWidths: const {

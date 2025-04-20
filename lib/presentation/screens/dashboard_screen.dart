@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_floating_bottom_bar/flutter_floating_bottom_bar.dart';
 import 'package:manit/presentation/screens/academic_performance_screen.dart';
+import 'package:manit/presentation/widgets/custom_load_widget.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/student_data_provider.dart';
@@ -11,7 +12,7 @@ import 'profile_screen.dart';
 import 'result_screen.dart';
 import 'schedule_screen.dart';
 import 'announcements_screen.dart';
-import 'enrollment_screen.dart';
+import 'registration_screen.dart';
 import 'fees_account_section_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -143,7 +144,7 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
           physics: const NeverScrollableScrollPhysics(), // Disable swipe between tabs
           children: [
             _isLoading ? 
-              const Center(child: CircularProgressIndicator()) : 
+              const CustomLoadWidget() : 
               _buildDashboardContent(context, studentDataProvider, authProvider, controller),
             ProfileScreen(scrollController: controller),
             const ScheduleScreen(),
@@ -244,7 +245,7 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
     BuildContext context, 
     StudentDataProvider studentDataProvider,
     AuthProvider authProvider,
-    ScrollController controller, // Added scroll controller from BottomBar
+    ScrollController controller,
   ) {
     final theme = Theme.of(context);
     final user = authProvider.currentUser;
@@ -253,7 +254,7 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
     return RefreshIndicator(
       onRefresh: _loadData,
       child: ListView(
-        controller: controller, // Use the scroll controller from BottomBar
+        controller: controller,
         padding: const EdgeInsets.all(16),
         children: [
           // Welcome Card
@@ -368,13 +369,13 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
                 },
               ),
               DashboardCard(
-                title: 'Enrollment',
+                title: 'Registration',
                 icon: Icons.school_rounded,
                 color: AppTheme.successColor,
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const EnrollmentScreen()),
+                    MaterialPageRoute(builder: (_) => const RegistrationScreen()),
                   );
                 },
               ),

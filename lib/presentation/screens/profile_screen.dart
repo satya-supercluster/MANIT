@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:manit/presentation/widgets/custom_load_widget.dart';
 import 'package:manit/presentation/widgets/profile_avatar.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
@@ -21,7 +22,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final userData = authProvider.currentUser;
 
     if (userData == null) {
-      return const Center(child: CircularProgressIndicator());
+      return const CustomLoadWidget();
     }
 
     return Scaffold(

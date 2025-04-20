@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:manit/data/repositories/transform_fee_data_format.dart';
 import 'package:manit/presentation/providers/auth_provider.dart';
 import 'package:manit/presentation/providers/student_data_provider.dart';
+import 'package:manit/presentation/widgets/custom_error_widget.dart';
+import 'package:manit/presentation/widgets/custom_load_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -36,6 +38,8 @@ class _FeesAccountSectionScreenState extends State<FeesAccountSectionScreen> {
     
     final studentDataProvider = Provider.of<StudentDataProvider>(context, listen: false);
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    // extracting required arguments to fetch fee data
     final program = authProvider.currentUser?.programMasterId;
     final studentuid = authProvider.currentUser?.id;
 
@@ -82,45 +86,13 @@ class _FeesAccountSectionScreenState extends State<FeesAccountSectionScreen> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return CustomLoadWidget();
     }
 
     final studentDataProvider = Provider.of<StudentDataProvider>(context);
     
     if (studentDataProvider.hasError) {
-      return Center(
-       child: Padding(
-         padding: const EdgeInsets.all(24),
-         child: Column(
-           mainAxisAlignment: MainAxisAlignment.center,
-           children: [
-             const Icon(
-               Icons.error_outline,
-               size: 64,
-               color: Colors.red,
-             ),
-             const SizedBox(height: 16),
-             Text(
-               'Error Loading Fee Data',
-               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                 fontWeight: FontWeight.bold,
-               ),
-             ),
-             const SizedBox(height: 8),
-             Text(
-               studentDataProvider.errorMessage,
-               textAlign: TextAlign.center,
-               style: Theme.of(context).textTheme.bodyMedium,
-             ),
-             const SizedBox(height: 24),
-             ElevatedButton(
-               onPressed: _fetchFeeData,
-               child: const Text('Try Again'),
-             ),
-           ],
-         ),
-       ),
-     );
+      return CustomErrorWidget(message: "Failed to load Fee Information", onRetry: _fetchFeeData);
     }
 
     if (_transformedData == null) {
@@ -208,7 +180,7 @@ class _FeesAccountSectionScreenState extends State<FeesAccountSectionScreen> {
               _buildSummaryCard(
                 'Total Amount',
                 summaryData['totalAmount'] ?? 0,
-                'The total fees collected for this term.',
+                'Amount collected till this term.',
                 Colors.blue.shade100,
                 Icons.account_balance_wallet,
               ),
@@ -222,7 +194,7 @@ class _FeesAccountSectionScreenState extends State<FeesAccountSectionScreen> {
               _buildSummaryCard(
                 'Total Fees Demand',
                 summaryData['totalFeesPrice'] ?? 0,
-                'Total price for all registered subjects.',
+                'Amount required to pay till this term.',
                 Colors.amber.shade100,
                 Icons.receipt_long,
               ),
@@ -254,13 +226,18 @@ class _FeesAccountSectionScreenState extends State<FeesAccountSectionScreen> {
             children: [
               Icon(icon, color: Colors.black54),
               const SizedBox(width: 8),
-              Text(
+              Expanded(
+              child: Text(
                 title,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
                 ),
+                softWrap: true,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
+            ),
             ],
           ),
           const SizedBox(height: 8),
@@ -398,7 +375,7 @@ class _FeesAccountSectionScreenState extends State<FeesAccountSectionScreen> {
     );
   }
 
-  Widget _buildFeeTypesList(Map<String, dynamic> feeTypes) {
+  Widget _buildFeeTypesList(Map<dynamic, dynamic> feeTypes) {
     final feeTypeKeys = feeTypes.keys.toList();
     
     return ListView.builder(

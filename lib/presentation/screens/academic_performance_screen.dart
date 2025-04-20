@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:manit/presentation/widgets/custom_load_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:manit/presentation/providers/auth_provider.dart';
 import 'package:manit/presentation/providers/student_data_provider.dart';
@@ -93,7 +94,7 @@ class _AcademicPerformanceScreenState extends State<AcademicPerformanceScreen> w
       body: RefreshIndicator(
         onRefresh: _loadGradesData,
         child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
+            ? CustomLoadWidget()
             : studentDataProvider.hasError
                 ? Center(
                     child: Column(

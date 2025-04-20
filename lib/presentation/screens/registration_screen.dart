@@ -3,14 +3,14 @@ import 'package:provider/provider.dart';
 import '../providers/student_data_provider.dart';
 import '../../core/constants/app_theme.dart';
 
-class EnrollmentScreen extends StatefulWidget {
-  const EnrollmentScreen({super.key});
+class RegistrationScreen extends StatefulWidget {
+  const RegistrationScreen({super.key});
 
   @override
-  State<EnrollmentScreen> createState() => _EnrollmentScreenState();
+  State<RegistrationScreen> createState() => _RegistrationScreenState();
 }
 
-class _EnrollmentScreenState extends State<EnrollmentScreen> {
+class _RegistrationScreenState extends State<RegistrationScreen> {
   bool _isLoading = true;
   bool _showCompletedCourses = false;
   

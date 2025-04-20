@@ -51,6 +51,7 @@ Map<String, dynamic> transformFeeDataFormat(Map<String, dynamic> rawData) {
     }
   }
   // Return combined data
+  // print(groupedData);
   return {
     'groupedData': groupedData,
     'summaryData': summaryData,

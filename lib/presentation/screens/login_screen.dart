@@ -76,7 +76,6 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: SingleChildScrollView(
-          // Better keyboard handling with physics
           physics: const ClampingScrollPhysics(),
           // Removed fixed height container that was causing constraint issues
           child: Padding(
