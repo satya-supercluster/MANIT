@@ -8,6 +8,7 @@ import '../../data/models/user_model.dart';
 class AuthProvider extends ChangeNotifier {
   bool _isLoading = false;
   bool _isAuthenticated = false;
+  bool canCheckBiometrics=true;
   String _error = '';
   User? _currentUser;
   final FlutterSecureStorage _storage = const FlutterSecureStorage();

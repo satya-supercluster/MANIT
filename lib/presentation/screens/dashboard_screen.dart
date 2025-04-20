@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_floating_bottom_bar/flutter_floating_bottom_bar.dart';
 import 'package:manit/presentation/screens/academic_performance_screen.dart';
+import 'package:manit/presentation/screens/complaint_screen.dart';
 import 'package:manit/presentation/widgets/custom_load_widget.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
@@ -10,8 +11,7 @@ import '../widgets/custom_app_bar.dart';
 import '../../core/constants/app_theme.dart';
 import 'profile_screen.dart';
 import 'result_screen.dart';
-import 'schedule_screen.dart';
-import 'announcements_screen.dart';
+import 'settings_screen.dart';
 import 'registration_screen.dart';
 import 'fees_account_section_screen.dart';
 
@@ -119,8 +119,8 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
     final List<String> screenTitles = [
       'Student Dashboard',
       'Profile',
-      'Schedule',
-      'Alerts'
+      'Complaints',
+      'Settings'
     ];
 
     // Generate avatar text from user's name
@@ -147,8 +147,8 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
               const CustomLoadWidget() : 
               _buildDashboardContent(context, studentDataProvider, authProvider, controller),
             ProfileScreen(scrollController: controller),
-            const ScheduleScreen(),
-            const AnnouncementsScreen(),
+            const ComplaintScreen(),
+            SettingsScreen(scrollController: controller)
           ],
         ),
         // Customizations for the floating bar
@@ -185,8 +185,8 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
     final List<IconData> icons = [
       Icons.dashboard_rounded,
       Icons.person_rounded,
-      Icons.calendar_month_rounded,
-      Icons.notifications_rounded,
+      Icons.pending_actions_rounded,
+      Icons.settings_rounded
     ];
 
     return Container(
@@ -383,6 +383,28 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
                 title: 'Fee Info',
                 icon: Icons.account_balance_wallet_rounded,
                 color: AppTheme.warningColor,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const FeesAccountSectionScreen()),
+                  );
+                },
+              ),
+              DashboardCard(
+                title: 'Feedback',
+                icon: Icons.chat,
+                color: Colors.purple,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const FeesAccountSectionScreen()),
+                  );
+                },
+              ),
+              DashboardCard(
+                title: 'TimeTable',
+                icon: Icons.calendar_month_rounded,
+                color: Colors.orange,
                 onTap: () {
                   Navigator.push(
                     context,

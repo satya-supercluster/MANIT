@@ -33,6 +33,10 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       ),
     );
     _animationController.forward();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      authProvider.initAuth();
+    });
   }
 
   @override
