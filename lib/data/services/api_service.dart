@@ -4,7 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ApiService {
   // Replace with your college API base URL
-  // final String baseUrl = 'https://complaint-portal-manit-backend.onrender.com';
+  final String complaintBaseUrl = 'https://complaint-portal-manit-backend.onrender.com';
   final String baseUrl = 'https://erpapi.manit.ac.in/api';
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
@@ -13,8 +13,16 @@ class ApiService {
   ApiService({required this.dio});
 
   // Get auth headers
-  Future<Map<String, String>> _getHeaders() async {
+  Future<Map<String, String>> getHeaders() async {
     final token = await _storage.read(key: 'token');
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': token != null ? 'Bearer $token' : '',
+    };
+  }
+  // Get complaint headers
+  Future<Map<String, String>> getComplaintHeaders() async {
+    final token = await _storage.read(key: 'complaint-token');
     return {
       'Content-Type': 'application/json',
       'Authorization': token != null ? 'Bearer $token' : '',
@@ -33,7 +41,6 @@ class ApiService {
         'password': password,
       }),
     );
-    
     if (loginResponse.statusCode != 200) {
       if (loginResponse.statusCode == 401) {
         return {
@@ -142,10 +149,58 @@ class ApiService {
   }
 }
 
+
+  Future<Map<String,dynamic>> getComplaintToken(String studentId) async {
+    // print("hello-token");
+    try {
+      final headers=await getHeaders();
+      final response = await dio.post(
+        '$complaintBaseUrl/generateToken',
+        options: Options(headers: headers),
+        data: jsonEncode({
+          'studentId': studentId,
+        }),
+      );
+      // print(response);
+      if (response.statusCode == 200) {
+        return {'success': true, 'token': response.data?['site_token']};
+      } else if (response.statusCode == 401) {
+        return {'success': false, 'message': 'Unauthorized access'};
+      } else {
+        return {'success': false, 'message': 'Failed to load profile'};
+      }
+    } catch (e) {
+      print(e);
+      return {'success': false, 'message': 'Connection error'};
+    }
+  }
+
+  Future<Map<String,dynamic>> getComplaints(String studentId) async {
+    try {
+      final headers=await getComplaintHeaders();
+      print(headers);
+      final response = await dio.get(
+        '$complaintBaseUrl/complaint/get?studentId=$studentId',
+        options: Options(headers: headers),
+      );
+      if (response.statusCode == 200) {
+        return {'success': true, 'data': response.data};
+      } else if (response.statusCode == 401) {
+        return {'success': false, 'message': 'Unauthorized access'};
+      } else {
+        return {'success': false, 'message': 'Failed to load profile'};
+      }
+    } catch (e) {
+      print("e");
+      print(e);
+      return {'success': false, 'message': 'Connection error $e'};
+    }
+  }
+
   // Get student profile info
   Future<Map<String, dynamic>> getStudentProfile() async {
     try {
-      final headers=await _getHeaders();
+      final headers=await getHeaders();
       final response = await dio.get(
         '$baseUrl/student_profile_check',
         options: Options(headers: headers),
@@ -167,7 +222,7 @@ class ApiService {
     try {
       final response = await dio.get(
         '$baseUrl/student_profile',
-        options: Options(headers: await _getHeaders()),
+        options: Options(headers: await getHeaders()),
       );
 
       if (response.statusCode == 200) {
@@ -186,7 +241,7 @@ class ApiService {
   Future<Map<String, dynamic>> getResults(String studentId) async {
     try {
       // print(studentId);
-      final headers=await _getHeaders();
+      final headers=await getHeaders();
       // print(headers);
       final response = await dio.post(
         '$baseUrl/student_result',
@@ -212,7 +267,7 @@ class ApiService {
     try {
       final response = await dio.get(
         '$baseUrl/student/schedule',
-        options: Options(headers: await _getHeaders()),
+        options: Options(headers: await getHeaders()),
       );
 
       if (response.statusCode == 200) {
@@ -230,7 +285,7 @@ class ApiService {
     try {
       final response = await dio.get(
         '$baseUrl/announcements',
-        options: Options(headers: await _getHeaders()),
+        options: Options(headers: await getHeaders()),
       );
 
       if (response.statusCode == 200) {
@@ -248,7 +303,7 @@ class ApiService {
     try {
       final response = await dio.get(
         '$baseUrl/student/enrollment',
-        options: Options(headers: await _getHeaders()),
+        options: Options(headers: await getHeaders()),
       );
 
       if (response.statusCode == 200) {
@@ -264,7 +319,7 @@ class ApiService {
   // Get fee status
   Future<Map<String, dynamic>> getFeeData(String program,String id) async {
     try {
-      final headers=await _getHeaders();
+      final headers=await getHeaders();
       // print(headers);
       final response = await dio.post(
         '$baseUrl/student_fees',

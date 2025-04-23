@@ -147,7 +147,7 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
               const CustomLoadWidget() : 
               _buildDashboardContent(context, studentDataProvider, authProvider, controller),
             ProfileScreen(scrollController: controller),
-            const ComplaintScreen(),
+            ComplaintScreen(scrollController: controller),
             SettingsScreen(scrollController: controller)
           ],
         ),

@@ -33,10 +33,6 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       ),
     );
     _animationController.forward();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      authProvider.initAuth();
-    });
   }
 
   @override
@@ -54,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
         _usernameController.text.trim(),
         _passwordController.text,
       );
-
+      print(success);
       if (success && mounted) {
         // Navigate to DashboardScreen and replace LoginScreen
         Navigator.pushReplacement(

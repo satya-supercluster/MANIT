@@ -9,6 +9,7 @@ import 'core/constants/app_theme.dart';
 import 'routes/app_router.dart'; // Import the router
 import 'presentation/providers/auth_provider.dart';
 import 'presentation/providers/student_data_provider.dart';
+import 'presentation/providers/complaint_provider.dart';
 
 final dio = Dio();
 
@@ -46,6 +47,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (_) => StudentDataProvider(dio: dio),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ComplaintProvider(dio: dio),
         ),
       ],
       child: MaterialApp(

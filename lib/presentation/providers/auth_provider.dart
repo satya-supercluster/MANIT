@@ -30,6 +30,7 @@ class AuthProvider extends ChangeNotifier {
       final userJson = await _storage.read(key: 'user');
       final token = await _storage.read(key: 'token');
 
+      print("hello");
       if (userJson != null && token != null) {
         _currentUser = User.fromJson(jsonDecode(userJson));
         _isAuthenticated = true;
@@ -48,7 +49,7 @@ class AuthProvider extends ChangeNotifier {
     _isLoading = true;
     _error = '';
     notifyListeners();
-
+    // print("in");
     try {
       final response = await _apiService.login(username, password);
       if (response['success']) {
@@ -57,19 +58,20 @@ class AuthProvider extends ChangeNotifier {
         // Save user and token data
         await _storage.write(key: 'user', value: jsonEncode(_currentUser!.toJson()));
         await _storage.write(key: 'token', value: response['token']);
-        
+        // print("login_prov");
         _isLoading = false;
         notifyListeners();
         return true;
       } else {
         _error = response['message'] ?? 'Login failed';
+        print(_error);
         _isLoading = false;
         notifyListeners();
         return false;
       }
     } catch (e) {
       _error = 'Failed to connect to server. Please check your internet connection. $e';
-      print(_error);
+      print(e);
       _isLoading = false;
       notifyListeners();
       return false;
