@@ -262,6 +262,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                   : const Text(
                                       'SIGN IN',
                                       style: TextStyle(
+                                        color: Colors.white,
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
                                         letterSpacing: 1.2,

@@ -49,11 +49,11 @@ class ComplaintProvider extends ChangeNotifier {
     _isLoading = true;
     _hasError = false;
     notifyListeners();
-    print("fetch");
+    // print("fetch");
     try {
       
       final response = await _apiService.getComplaints(studentId);
-      print(response);
+      // print(response);
       if (response['success'] == true) {
         final outer = response['data'] as Map<String, dynamic>;
         final rawList = outer['data'];
@@ -72,6 +72,33 @@ class ComplaintProvider extends ChangeNotifier {
       }
       }
       else {
+        _hasError = true;
+        _error = response['message'] ?? 'Failed to load complaints';
+      }
+    } catch (e) {
+      _hasError = true;
+      _error = 'Connection error. Please check your internet.';
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> addComplaint(Map<String, dynamic> completeFormData) async {
+    // Make a copy to ensure it's not affected by reference
+    final formDataCopy = Map<String, dynamic>.from(completeFormData);
+    
+    _isLoading = true;
+    _hasError = false;
+    notifyListeners();
+
+    try {
+      // Pass the copy to maintain integrity
+      final response = await _apiService.postComplaint(formDataCopy);
+
+      if (response['success'] == true) {
+        // print("Complaint added successfully");
+      } else {
         _hasError = true;
         _error = response['message'] ?? 'Failed to load complaints';
       }

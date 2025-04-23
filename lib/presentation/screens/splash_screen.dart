@@ -1,43 +1,57 @@
-// lib/presentation/screens/splash_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'dart:async';
-
 import '../providers/auth_provider.dart';
-import '../../routes/app_router.dart';
+import './login_screen.dart';
+import './dashboard_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  _SplashScreenState createState() => _SplashScreenState();
+  State<SplashScreen> createState() => _SplashScreenState();
 }
 
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    
+    // Check authentication status after the widget is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkAuthentication();
+      _checkAuthStatus();
     });
   }
 
-  Future<void> _checkAuthentication() async {
-    // Delay for splash screen visibility
-    await Future.delayed(const Duration(seconds: 2));
+  Future<void> _checkAuthStatus() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    
+    // First check if biometric login is enabled and try it
+    if (authProvider.canCheckBiometrics && authProvider.isBiometricEnabled) {
+      final success = await authProvider.authenticateWithBiometrics();
+      if (success && mounted) {
+        // Navigate to dashboard on successful biometric auth
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const DashboardScreen()),
+        );
+        return;
+      }
+    }
+    
+    // If biometric auth failed or not enabled, proceed with normal auth check
+    await authProvider.initAuth();
     
     if (!mounted) return;
     
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    await authProvider.initAuth();
-    
     // Navigate based on authentication status
     if (authProvider.isAuthenticated) {
-      Navigator.of(context).pushReplacementNamed(AppRouter.dashboard);
+      // Navigate to dashboard if authenticated
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const DashboardScreen()),
+      );
     } else {
-      Navigator.of(context).pushReplacementNamed(AppRouter.login);
+      // Navigate to login if not authenticated
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+      );
     }
   }
 
@@ -48,22 +62,22 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Your logo or app name
+            // App logo
             Image.asset(
               'assets/images/manit_logo.png',
-              width: 150,
-              height: 150,
+              height: 120,
+              width: 120,
             ),
             const SizedBox(height: 24),
+            const CircularProgressIndicator(),
+            const SizedBox(height: 24),
             const Text(
-              'MANIT - Academic Portal',
+              'MANIT Academic Portal',
               style: TextStyle(
-                fontSize: 24,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 32),
-            const CircularProgressIndicator(),
           ],
         ),
       ),

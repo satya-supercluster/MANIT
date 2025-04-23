@@ -90,7 +90,7 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final studentDataProvider = Provider.of<StudentDataProvider>(context, listen: false);
     
-    await authProvider.logout();
+    await authProvider.logout(context);
     studentDataProvider.reset();
     
     if (!mounted) return;
@@ -146,9 +146,9 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
             _isLoading ? 
               const CustomLoadWidget() : 
               _buildDashboardContent(context, studentDataProvider, authProvider, controller),
-            ProfileScreen(scrollController: controller),
-            ComplaintScreen(scrollController: controller),
-            SettingsScreen(scrollController: controller)
+            ProfileScreen(),
+            ComplaintScreen(),
+            SettingsScreen()
           ],
         ),
         // Customizations for the floating bar

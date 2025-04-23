@@ -10,8 +10,7 @@ import './complaint_detail_screen.dart';
 import './add_complaint_screen.dart';
 
 class ComplaintScreen extends StatefulWidget {
-  final ScrollController scrollController;
-  const ComplaintScreen({Key? key, required this.scrollController}) : super(key: key);
+  const ComplaintScreen({Key? key}) : super(key: key);
 
   @override
   State<ComplaintScreen> createState() => _ComplaintScreenState();
@@ -356,7 +355,6 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
                     : _filteredComplaints.isEmpty
                         ? const Center(child: Text('No complaints match your filter criteria'))
                         : ListView.builder(
-                          controller: widget.scrollController,
                             padding: const EdgeInsets.all(8.0),
                             itemCount: _filteredComplaints.length,
                             itemBuilder: (ctx, index) {
@@ -383,11 +381,15 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
                                     child: Row(
                                       children: [
                                         Expanded(child: Text('Date: ${complaint.dateReported}')),
-                                        Text(
-                                          complaint.complaintType,
-                                          style: TextStyle(
-                                            color: Colors.blue[800],
-                                            fontWeight: FontWeight.w500,
+                                        Container(
+                                          width:80,
+                                          child: Text(
+                                            complaint.complaintType,
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: Colors.blue[800],
+                                              fontWeight: FontWeight.w500,
+                                            ),
                                           ),
                                         ),
                                       ],
@@ -405,21 +407,28 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
                             },
                           ),
               ),
-              SizedBox(height:70),
+              SizedBox(height:80),
             ],
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const AddComplaintScreen(),
-            ),
-          );
-        },
-        child: const Icon(Icons.add),
-        backgroundColor: Colors.blue,
+      floatingActionButton: Container(
+        margin: const EdgeInsets.only(bottom: 80.0),
+        child: FloatingActionButton(
+          onPressed: () {
+            Navigator.of(context)
+              .push<bool>(
+                MaterialPageRoute(builder: (_) => const AddComplaintScreen()),
+              )
+              .then((didAdd) {
+                if (didAdd == true) {
+                  _fetchComplaints();
+                }
+              });
+          },
+          child: const Icon(Icons.add),
+          backgroundColor: Colors.blue,
+        ),
       ),
     );
   }

@@ -80,6 +80,10 @@ class _AddComplaintScreenState extends State<AddComplaintScreen> {
     ],
   };
 
+  @override
+  void initState() {
+    super.initState();
+  }
   Future<void> _submitForm() async {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -101,7 +105,7 @@ class _AddComplaintScreenState extends State<AddComplaintScreen> {
         'studentName': authProvider.currentUser?.name,
       };
       
-      // await complaintProvider.addComplaint(completeFormData);
+      await complaintProvider.addComplaint(Map<String, dynamic>.from(completeFormData));
       
       if (mounted) {
         Navigator.of(context).pop();
@@ -130,6 +134,7 @@ class _AddComplaintScreenState extends State<AddComplaintScreen> {
       appBar: AppBar(
         title: const Text('Submit Complaint', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.blue[600],
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())

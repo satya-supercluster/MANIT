@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:manit/presentation/screens/splash_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../presentation/screens/login_screen.dart';
@@ -8,8 +9,8 @@ import '../presentation/screens/dashboard_screen.dart';
 
 class AppRouter {
   static const String login = '/login';
-  static const String dashboard = '/';
-  // Add more route names as needed
+  static const String dashboard = '/dashboard';
+  static const String splash='/';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -18,6 +19,9 @@ class AppRouter {
       
       case dashboard:
         return ProtectedRoute(builder: (_) => DashboardScreen());
+
+      case splash:
+        return ProtectedRoute(builder: (_) => SplashScreen());
 
       
       default:

@@ -150,53 +150,6 @@ class ApiService {
 }
 
 
-  Future<Map<String,dynamic>> getComplaintToken(String studentId) async {
-    // print("hello-token");
-    try {
-      final headers=await getHeaders();
-      final response = await dio.post(
-        '$complaintBaseUrl/generateToken',
-        options: Options(headers: headers),
-        data: jsonEncode({
-          'studentId': studentId,
-        }),
-      );
-      // print(response);
-      if (response.statusCode == 200) {
-        return {'success': true, 'token': response.data?['site_token']};
-      } else if (response.statusCode == 401) {
-        return {'success': false, 'message': 'Unauthorized access'};
-      } else {
-        return {'success': false, 'message': 'Failed to load profile'};
-      }
-    } catch (e) {
-      print(e);
-      return {'success': false, 'message': 'Connection error'};
-    }
-  }
-
-  Future<Map<String,dynamic>> getComplaints(String studentId) async {
-    try {
-      final headers=await getComplaintHeaders();
-      print(headers);
-      final response = await dio.get(
-        '$complaintBaseUrl/complaint/get?studentId=$studentId',
-        options: Options(headers: headers),
-      );
-      if (response.statusCode == 200) {
-        return {'success': true, 'data': response.data};
-      } else if (response.statusCode == 401) {
-        return {'success': false, 'message': 'Unauthorized access'};
-      } else {
-        return {'success': false, 'message': 'Failed to load profile'};
-      }
-    } catch (e) {
-      print("e");
-      print(e);
-      return {'success': false, 'message': 'Connection error $e'};
-    }
-  }
-
   // Get student profile info
   Future<Map<String, dynamic>> getStudentProfile() async {
     try {
@@ -339,4 +292,80 @@ class ApiService {
       return {'success': false, 'message': 'Connection error'};
     }
   }
+
+
+  
+
+  Future<Map<String,dynamic>> getComplaintToken(String studentId) async {
+    // print("hello-token");
+    try {
+      final headers=await getHeaders();
+      final response = await dio.post(
+        '$complaintBaseUrl/generateToken',
+        options: Options(headers: headers),
+        data: jsonEncode({
+          'studentId': studentId,
+        }),
+      );
+      // print(response);
+      if (response.statusCode == 200) {
+        return {'success': true, 'token': response.data?['site_token']};
+      } else if (response.statusCode == 401) {
+        return {'success': false, 'message': 'Unauthorized access'};
+      } else {
+        return {'success': false, 'message': 'Failed to get token'};
+      }
+    } catch (e) {
+      print(e);
+      return {'success': false, 'message': 'Connection error'};
+    }
+  }
+
+  Future<Map<String,dynamic>> getComplaints(String studentId) async {
+    try {
+      final headers=await getComplaintHeaders();
+      // print(headers);
+      final response = await dio.get(
+        '$complaintBaseUrl/complaint/get?studentId=$studentId',
+        options: Options(headers: headers),
+      );
+      if (response.statusCode == 200) {
+        return {'success': true, 'data': response.data};
+      } else if (response.statusCode == 401) {
+        return {'success': false, 'message': 'Unauthorized access'};
+      } else {
+        return {'success': false, 'message': 'Failed to load complaints'};
+      }
+    } catch (e) {
+      // print("e");
+      // print(e);
+      return {'success': false, 'message': 'Connection error $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> postComplaint(Map<String, dynamic> completeFormData) async {
+    try {
+      final headers = await getComplaintHeaders();
+
+      final response = await dio.post(
+        '$complaintBaseUrl/complaint/post?studentId=${completeFormData['studentId']}',
+        options: Options(headers: headers),
+        data: completeFormData,
+      );
+
+      print("Response: ${response.data}");
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'data': response.data};
+      } else if (response.statusCode == 401) {
+        return {'success': false, 'message': 'Unauthorized access'};
+      } else {
+        return {'success': false, 'message': 'Failed to post complaint'};
+      }
+    } catch (e) {
+      print("API Exception: $e");
+      return {'success': false, 'message': 'Connection error $e'};
+    }
+  }
 }
+

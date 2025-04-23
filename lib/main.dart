@@ -6,7 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 
 import 'core/constants/app_theme.dart';
-import 'routes/app_router.dart'; // Import the router
+import 'routes/app_router.dart';
 import 'presentation/providers/auth_provider.dart';
 import 'presentation/providers/student_data_provider.dart';
 import 'presentation/providers/complaint_provider.dart';
@@ -58,7 +58,7 @@ class MyApp extends StatelessWidget {
         theme: AppTheme.lightTheme(),
         darkTheme: AppTheme.darkTheme(),
         themeMode: ThemeMode.system,
-        initialRoute: AppRouter.login, // Set initial route
+        initialRoute: AppRouter.splash, // Set initial route
         onGenerateRoute: AppRouter.generateRoute, // Use the router
       ),
     );
