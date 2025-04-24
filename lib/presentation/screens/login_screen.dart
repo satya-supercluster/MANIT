@@ -50,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
         _usernameController.text.trim(),
         _passwordController.text,
       );
-      print(success);
+      // print(success);
       if (success && mounted) {
         // Navigate to DashboardScreen and replace LoginScreen
         Navigator.pushReplacement(

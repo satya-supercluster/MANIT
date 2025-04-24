@@ -23,6 +23,10 @@ class AuthProvider extends ChangeNotifier {
     _checkBiometricAvailability();
   }
 
+  Future<void> initialize() async {
+    await _checkBiometricAvailability();
+  }
+
   bool get isLoading => _isLoading;
   bool get isAuthenticated => _isAuthenticated;
   String get error => _error;
@@ -35,12 +39,15 @@ class AuthProvider extends ChangeNotifier {
     try {
       _canCheckBiometrics = await _localAuth.canCheckBiometrics;
       final biometricTypes = await _localAuth.getAvailableBiometrics();
+      // print('Available biometric types: $biometricTypes');
       _canCheckBiometrics = _canCheckBiometrics && biometricTypes.isNotEmpty;
       
       // Check if biometric login is enabled in user preferences
-      _isBiometricEnabled = await _storage.read(key: 'biometric_enabled') == 'true';
+      final storedValue = await _storage.read(key: 'biometric_enabled');
+      // print('Stored biometric_enabled value: $storedValue');
+      _isBiometricEnabled = storedValue == 'true';
     } on PlatformException catch (e) {
-      print('Biometric check failed: $e');
+      // print('Biometric check failed: $e');
       _canCheckBiometrics = false;
       _isBiometricEnabled = false;
     }
@@ -51,14 +58,17 @@ class AuthProvider extends ChangeNotifier {
   Future<void> setBiometricEnabled(bool enabled) async {
     _isBiometricEnabled = enabled;
     await _storage.write(key: 'biometric_enabled', value: enabled.toString());
+    // print(enabled.toString());
     notifyListeners();
   }
 
   // Authenticate using biometrics
   Future<bool> authenticateWithBiometrics() async {
+    // print("aaya to");
     if (!_canCheckBiometrics || !_isBiometricEnabled) return false;
     
     try {
+      // print("authenticating bio");
       final authenticated = await _localAuth.authenticate(
         localizedReason: 'Authenticate to access MANIT Academic Portal',
         options: const AuthenticationOptions(
@@ -66,7 +76,7 @@ class AuthProvider extends ChangeNotifier {
           biometricOnly: true,
         ),
       );
-
+      // print("auth $authenticated");
       if (authenticated) {
         // Get stored credentials and try to login
         final storedUsername = await _storage.read(key: 'username');
@@ -80,13 +90,14 @@ class AuthProvider extends ChangeNotifier {
       }
       return false;
     } catch (e) {
-      print('Biometric authentication error: $e');
+      // print('Biometric authentication error: $e');
       return false;
     }
   }
 
   // Silent login for biometric auth (doesn't update loading state)
   Future<bool> _silentLogin(String username, String password) async {
+    // print("silent");
     try {
       final response = await _apiService.login(username, password);
       if (response['success']) {
@@ -99,6 +110,7 @@ class AuthProvider extends ChangeNotifier {
       }
       return false;
     } catch (e) {
+      // print("e $e");
       return false;
     }
   }
@@ -112,6 +124,7 @@ class AuthProvider extends ChangeNotifier {
       // First try biometric authentication if enabled
       if (_isBiometricEnabled) {
         final biometricSuccess = await authenticateWithBiometrics();
+        // print("biometrix: $biometricSuccess");
         if (biometricSuccess) {
           _isLoading = false;
           notifyListeners();
@@ -144,7 +157,7 @@ class AuthProvider extends ChangeNotifier {
     _isLoading = true;
     _error = '';
     notifyListeners();
-    
+    // print("in login");
     try {
       final response = await _apiService.login(username, password);
       if (response['success']) {
@@ -154,12 +167,8 @@ class AuthProvider extends ChangeNotifier {
         // Save user and token data
         await _storage.write(key: 'user', value: jsonEncode(_currentUser!.toJson()));
         await _storage.write(key: 'token', value: response['token']);
-        
-        // Store credentials if biometric is enabled (for future biometric logins)
-        if (_isBiometricEnabled) {
-          await _storage.write(key: 'username', value: username);
-          await _storage.write(key: 'password', value: password);
-        }
+        await _storage.write(key: 'username', value: username);
+        await _storage.write(key: 'password', value: password);
         
         _isLoading = false;
         notifyListeners();
