@@ -137,34 +137,36 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   }
 
   Future<void> _checkAuthStatus() async {
-    print("check status");
+    // print("check status");
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       await authProvider.initialize();
-      print(authProvider.canCheckBiometrics);
-      print(authProvider.isBiometricEnabled);
+      // print(authProvider.canCheckBiometrics);
+      // print(authProvider.isBiometricEnabled);
       // First try biometric authentication
       if (authProvider.canCheckBiometrics && authProvider.isBiometricEnabled) {
-        print("can");
+        // print("can");
         setState(() {
           _statusMessage = 'Waiting for biometric authentication...';
         });
         
         final biometricSuccess = await authProvider.authenticateWithBiometrics();
-        print("bbbio: $biometricSuccess");
+        // print("bbbio: $biometricSuccess");
         if (!mounted) return;
         
         if (biometricSuccess) {
           // If biometric auth succeeds, navigate to dashboard
-          print('Biometric authentication successful!');
+          // print('Biometric authentication successful!');
           _navigateToDashboard();
           return;
         } else {
           // If biometric fails, update status message
-          print('Biometric authentication failed, trying regular auth...');
-          setState(() {
-            _statusMessage = 'Checking saved credentials...';
-          });
+          // print('Biometric authentication failed, trying regular auth...');
+          if(mounted){
+            setState(() {
+              _statusMessage = 'Checking saved credentials...';
+            });
+          }
         }
       }
       
@@ -175,14 +177,14 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       
       // Check if we got authenticated through initAuth
       if (authProvider.isAuthenticated) {
-        print('Regular authentication successful!');
+        // print('Regular authentication successful!');
         _navigateToDashboard();
       } else {
-        print('All authentication methods failed, going to login screen.');
+        // print('All authentication methods failed, going to login screen.');
         _navigateToLogin();
       }
     } catch (e) {
-      print('Error during authentication check: $e');
+      // print('Error during authentication check: $e');
       if (mounted) {
         _navigateToLogin();
       }

@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:manit/presentation/providers/auth_provider.dart';
+import 'package:manit/presentation/providers/theme_provider.dart'; // Add this import
+import 'package:manit/presentation/screens/login_screen.dart';
 import 'package:provider/provider.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({super.key});
+  final ScrollController scrollController;
+  const SettingsScreen({super.key, required this.scrollController});
 
   @override
   _SettingsScreenState createState() => _SettingsScreenState();
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  ThemeMode _currentThemeMode = ThemeMode.system;
   late AuthProvider _authProvider;
 
   @override
@@ -21,15 +23,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
   }
 
-  void _updateThemeMode(ThemeMode mode) {
-    setState(() {
-      _currentThemeMode = mode;
-    });
-    // In a real app, you would save this preference
-    // SharedPreferences prefs = await SharedPreferences.getInstance();
-    // prefs.setString('themeMode', mode.toString());
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -38,123 +31,145 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       body: Consumer<AuthProvider>(
         builder: (context, authProvider, _) {
-          return ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              _buildSectionCard(
-                title: 'Account & Security',
+          return Consumer<ThemeProvider>(  // Add ThemeProvider consumer
+            builder: (context, themeProvider, _) {
+              return ListView(
+                controller: widget.scrollController,
+                padding: const EdgeInsets.all(16),
                 children: [
-                  if (authProvider.canCheckBiometrics)
-                    _buildSwitchTile(
-                      icon: Icons.fingerprint,
-                      title: 'Biometric Login',
-                      subtitle: 'Use fingerprint or face recognition to login',
-                      value: authProvider.isBiometricEnabled,
-                      onChanged: (value) {
-                        authProvider.setBiometricEnabled(value);
-                      },
+                  _buildSectionCard(
+                    title: 'Account & Security',
+                    children: [
+                      if (authProvider.canCheckBiometrics)
+                        _buildSwitchTile(
+                          icon: Icons.fingerprint,
+                          title: 'Biometric Login',
+                          subtitle: 'Use fingerprint or face recognition to login',
+                          value: authProvider.isBiometricEnabled,
+                          onChanged: (value) {
+                            authProvider.setBiometricEnabled(value);
+                          },
+                        ),
+                      const Divider(),
+                      _buildActionTile(
+                        icon: Icons.password,
+                        title: 'Change Password',
+                        onTap: () {
+                          _showComingSoonSnackbar('Password change will be available soon');
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  _buildSectionCard(
+                    title: 'Appearance',
+                    children: [
+                      _buildRadioTile(
+                        title: 'Light Theme',
+                        leadingIcon: Icons.light_mode,
+                        value: ThemeMode.light,
+                        groupValue: themeProvider.themeMode,  // Use theme from provider
+                        onChanged: (value) {
+                          themeProvider.setThemeMode(value as ThemeMode);  // Update theme via provider
+                        },
+                      ),
+                      _buildRadioTile(
+                        title: 'Dark Theme',
+                        leadingIcon: Icons.dark_mode,
+                        value: ThemeMode.dark,
+                        groupValue: themeProvider.themeMode,  // Use theme from provider
+                        onChanged: (value) {
+                          themeProvider.setThemeMode(value as ThemeMode);  // Update theme via provider
+                        },
+                      ),
+                      _buildRadioTile(
+                        title: 'System Default',
+                        leadingIcon: Icons.settings_system_daydream,
+                        value: ThemeMode.system,
+                        groupValue: themeProvider.themeMode,  // Use theme from provider
+                        onChanged: (value) {
+                          themeProvider.setThemeMode(value as ThemeMode);  // Update theme via provider
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      // Handle logout
+                      _showLogoutDialog();
+                      Future.delayed(const Duration(milliseconds: 500), () {
+                        Navigator.of(context).pushReplacement(
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation, secondaryAnimation) => const LoginScreen(),
+                            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                              const begin = 0.0;
+                              const end = 1.0;
+                              const curve = Curves.easeInOut;
+                              var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                              var fadeAnimation = animation.drive(tween);
+                              return FadeTransition(opacity: fadeAnimation, child: child);
+                            },
+                            transitionDuration: const Duration(milliseconds: 600),
+                          ),
+                        );
+                      });
+                    },
+                    icon: const Icon(Icons.logout),
+                    label: const Text('Log Out'),
+                  ),
+                  const SizedBox(height: 24),
+                  _buildSectionCard(
+                    title: 'Support',
+                    children: [
+                      _buildActionTile(
+                        icon: Icons.help_outline,
+                        title: 'Help Center',
+                        subtitle: 'Get answers to frequently asked questions',
+                        onTap: () {
+                          _showComingSoonSnackbar('Help center will be available soon');
+                        },
+                      ),
+                      const Divider(),
+                      _buildActionTile(
+                        icon: Icons.headset_mic,
+                        title: 'Contact Support',
+                        subtitle: 'Reach out to our support team',
+                        onTap: () {
+                          _showComingSoonSnackbar('Support contact will be available soon');
+                        },
+                      ),
+                      const Divider(),
+                      _buildActionTile(
+                        icon: Icons.message_outlined,
+                        title: 'Suggestions & Feedback',
+                        subtitle: 'Help us improve the Academic Portal',
+                        onTap: () {
+                          _showComingSoonSnackbar('Feedback form will be available soon');
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  Center(
+                    child: Text(
+                      'MANIT Academic Portal v1.0.0',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                      ),
                     ),
-                  const Divider(),
-                  _buildActionTile(
-                    icon: Icons.password,
-                    title: 'Change Password',
-                    onTap: () {
-                      _showComingSoonSnackbar('Password change will be available soon');
-                    },
                   ),
+                  const SizedBox(height: 24),
                 ],
-              ),
-              const SizedBox(height: 16),
-              _buildSectionCard(
-                title: 'Appearance',
-                children: [
-                  _buildRadioTile(
-                    title: 'Light Theme',
-                    leadingIcon: Icons.light_mode,
-                    value: ThemeMode.light,
-                    groupValue: _currentThemeMode,
-                    onChanged: (value) {
-                      _updateThemeMode(value as ThemeMode);
-                    },
-                  ),
-                  _buildRadioTile(
-                    title: 'Dark Theme',
-                    leadingIcon: Icons.dark_mode,
-                    value: ThemeMode.dark,
-                    groupValue: _currentThemeMode,
-                    onChanged: (value) {
-                      _updateThemeMode(value as ThemeMode);
-                    },
-                  ),
-                  _buildRadioTile(
-                    title: 'System Default',
-                    leadingIcon: Icons.settings_system_daydream,
-                    value: ThemeMode.system,
-                    groupValue: _currentThemeMode,
-                    onChanged: (value) {
-                      _updateThemeMode(value as ThemeMode);
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton.icon(
-                onPressed: () {
-                  // Handle logout
-                  _showLogoutDialog();
-                },
-                icon: const Icon(Icons.logout),
-                label: const Text('Log Out'),
-              ),
-              const SizedBox(height: 24),
-              _buildSectionCard(
-                title: 'Support',
-                children: [
-                  _buildActionTile(
-                    icon: Icons.help_outline,
-                    title: 'Help Center',
-                    subtitle: 'Get answers to frequently asked questions',
-                    onTap: () {
-                      _showComingSoonSnackbar('Help center will be available soon');
-                    },
-                  ),
-                  const Divider(),
-                  _buildActionTile(
-                    icon: Icons.headset_mic,
-                    title: 'Contact Support',
-                    subtitle: 'Reach out to our support team',
-                    onTap: () {
-                      _showComingSoonSnackbar('Support contact will be available soon');
-                    },
-                  ),
-                  const Divider(),
-                  _buildActionTile(
-                    icon: Icons.message_outlined,
-                    title: 'Suggestions & Feedback',
-                    subtitle: 'Help us improve the Academic Portal',
-                    onTap: () {
-                      _showComingSoonSnackbar('Feedback form will be available soon');
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              Center(
-                child: Text(
-                  'MANIT Academic Portal v1.0.0',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-            ],
+              );
+            },
           );
         },
       ),
     );
   }
 
+  // The rest of the methods remain unchanged
   Widget _buildSectionCard({required String title, required List<Widget> children}) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),

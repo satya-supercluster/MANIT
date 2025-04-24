@@ -5,7 +5,8 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final ScrollController scrollController;
+  const ProfileScreen({super.key, required this.scrollController});
   
 
   @override
@@ -25,135 +26,138 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     return Scaffold(
-      body: SingleChildScrollView(
-        child:Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
-          child: Column(
-            children: [
-              // Profile Header with Gradient
-              Container(
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF3B82F6), Color(0xFF2563EB)],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
+      body: ListView(
+        controller: widget.scrollController,
+        children: [
+          Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+              child: Column(
+                children: [
+                  // Profile Header with Gradient
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF3B82F6), Color(0xFF2563EB)],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ),
+                    borderRadius: BorderRadius.circular(16.0),
                   ),
-                  borderRadius: BorderRadius.circular(16.0),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Column(
-                    children: [
-                      // Profile Image
-                      Container(
-                        width: 120,
-                        height: 120,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.2),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: LinearGradient(
-                                colors: [Colors.white.withOpacity(0.8), Colors.white.withOpacity(0.4)],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      children: [
+                        // Profile Image
+                        Container(
+                          width: 120,
+                          height: 120,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white.withOpacity(0.2),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: LinearGradient(
+                                  colors: [Colors.white.withOpacity(0.8), Colors.white.withOpacity(0.4)],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
                               ),
+                              child: ProfileAvatar(base64Image: userData.profilePicture)
                             ),
-                            child: ProfileAvatar(base64Image: userData.profilePicture)
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      
-                      // User Details
-                      Text(
-                        userData.name,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
+                        const SizedBox(height: 16),
+
+                        // User Details
+                        Text(
+                          userData.name,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        userData.department,
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.9),
-                          fontSize: 16,
+                        const SizedBox(height: 4),
+                        Text(
+                          userData.department,
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: 16,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 12),
-                      
-                      // Badges
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _buildBadge(Icons.numbers, userData.studentId),
-                          const SizedBox(width: 8),
-                          _buildBadge(Icons.calendar_today, userData.semester),
-                        ],
+                        const SizedBox(height: 12),
+
+                        // Badges
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _buildBadge(Icons.numbers, userData.studentId),
+                            const SizedBox(width: 8),
+                            _buildBadge(Icons.calendar_today, userData.semester),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Tab Navigation
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        spreadRadius: 1,
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
                       ),
                     ],
                   ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              
-              // Tab Navigation
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      spreadRadius: 1,
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        _buildTabButton('personal', 'Personal', Icons.person),
+                        _buildTabButton('academic', 'Academic', Icons.school),
+                        _buildTabButton('family', 'Family', Icons.family_restroom),
+                        _buildTabButton('contact', 'Contact', Icons.phone),
+                        _buildTabButton('documents', 'Documents', Icons.description),
+                      ],
                     ),
-                  ],
-                ),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      _buildTabButton('personal', 'Personal', Icons.person),
-                      _buildTabButton('academic', 'Academic', Icons.school),
-                      _buildTabButton('family', 'Family', Icons.family_restroom),
-                      _buildTabButton('contact', 'Contact', Icons.phone),
-                      _buildTabButton('documents', 'Documents', Icons.description),
-                    ],
                   ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              
-              // Content based on active tab
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      spreadRadius: 1,
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+                const SizedBox(height: 24),
+
+                // Content based on active tab
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        spreadRadius: 1,
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  padding: const EdgeInsets.all(20),
+                  child: _buildTabContent(userData),
                 ),
-                padding: const EdgeInsets.all(20),
-                child: _buildTabContent(userData),
-              ),
-              SizedBox(height: 80,)
-            ],
+                SizedBox(height: 80,)
+              ],
+            ),
           ),
-        ),
-      ),
+        ],
+      )
     );
   }
 

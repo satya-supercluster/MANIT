@@ -10,7 +10,8 @@ import './complaint_detail_screen.dart';
 import './add_complaint_screen.dart';
 
 class ComplaintScreen extends StatefulWidget {
-  const ComplaintScreen({Key? key}) : super(key: key);
+  final ScrollController scrollController;
+  const ComplaintScreen({Key? key, required this.scrollController}) : super(key: key);
 
   @override
   State<ComplaintScreen> createState() => _ComplaintScreenState();
@@ -61,12 +62,16 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
         _isLoading = false;
       });
     } catch (error) {
-      setState(() {
-        _isLoading = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load complaints: ${error.toString()}')),
-      );
+      if(mounted){
+        setState(() {
+          _isLoading = false;
+        });
+      }
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to load complaints: ${error.toString()}')),
+        );
+      }
     }
   }
 
@@ -355,6 +360,7 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
                     : _filteredComplaints.isEmpty
                         ? const Center(child: Text('No complaints match your filter criteria'))
                         : ListView.builder(
+                          controller: widget.scrollController,
                             padding: const EdgeInsets.all(8.0),
                             itemCount: _filteredComplaints.length,
                             itemBuilder: (ctx, index) {
@@ -407,7 +413,7 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
                             },
                           ),
               ),
-              SizedBox(height:80),
+              SizedBox(height:20),
             ],
           ),
         ),

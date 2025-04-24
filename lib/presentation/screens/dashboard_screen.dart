@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_floating_bottom_bar/flutter_floating_bottom_bar.dart';
 import 'package:manit/presentation/screens/academic_performance_screen.dart';
 import 'package:manit/presentation/screens/complaint_screen.dart';
+import 'package:manit/presentation/screens/login_screen.dart';
 import 'package:manit/presentation/widgets/custom_load_widget.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
@@ -96,7 +97,22 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
     if (!mounted) return;
     
     // Navigate back to login screen
-    Navigator.of(context).pushReplacementNamed('/login');
+    Future.delayed(const Duration(milliseconds: 500), () {
+      Navigator.of(context).pushReplacement(
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => const LoginScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            const begin = 0.0;
+            const end = 1.0;
+            const curve = Curves.easeInOut;
+            var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+            var fadeAnimation = animation.drive(tween);
+            return FadeTransition(opacity: fadeAnimation, child: child);
+          },
+          transitionDuration: const Duration(milliseconds: 600),
+        ),
+      );
+    });
   }
   
   // Navigate to notifications
@@ -146,9 +162,9 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
             _isLoading ? 
               const CustomLoadWidget() : 
               _buildDashboardContent(context, studentDataProvider, authProvider, controller),
-            ProfileScreen(),
-            ComplaintScreen(),
-            SettingsScreen()
+            ProfileScreen(scrollController:controller),
+            ComplaintScreen(scrollController:controller),
+            SettingsScreen(scrollController:controller)
           ],
         ),
         // Customizations for the floating bar

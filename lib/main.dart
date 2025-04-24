@@ -10,6 +10,7 @@ import 'core/constants/app_theme.dart';
 import 'presentation/providers/auth_provider.dart';
 import 'presentation/providers/student_data_provider.dart';
 import 'presentation/providers/complaint_provider.dart';
+import 'presentation/providers/theme_provider.dart'; // Add this import
 
 final dio = Dio();
 
@@ -51,14 +52,21 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => ComplaintProvider(dio: dio),
         ),
+        ChangeNotifierProvider(
+          create: (_) => ThemeProvider(), // Add the theme provider
+        ),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'MANIT - Academic Portal',
-        theme: AppTheme.lightTheme(),
-        darkTheme: AppTheme.darkTheme(),
-        themeMode: ThemeMode.system,
-        home: SplashScreen(),
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, _) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'MANIT - Academic Portal',
+            theme: AppTheme.lightTheme(),
+            darkTheme: AppTheme.darkTheme(),
+            themeMode: themeProvider.themeMode, // Use the theme from provider
+            home: SplashScreen(),
+          );
+        },
       ),
     );
   }
