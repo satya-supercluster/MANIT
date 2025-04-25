@@ -391,7 +391,7 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const RegistrationScreen()),
+                    MaterialPageRoute(builder: (_) => RegistrationScreen()),
                   );
                 },
               ),

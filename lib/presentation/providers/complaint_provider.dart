@@ -66,10 +66,10 @@ class ComplaintProvider extends ChangeNotifier {
           _hasError = false;
         }
         else {
-        // In case the server sends an unexpected shape
-        _hasError = true;
-        _error = 'Unexpected data format from server.';
-      }
+          // In case the server sends an unexpected shape
+          _hasError = true;
+          _error = 'Unexpected data format from server.';
+        }
       }
       else {
         _hasError = true;

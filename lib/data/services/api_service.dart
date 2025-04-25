@@ -367,5 +367,32 @@ class ApiService {
       return {'success': false, 'message': 'Connection error $e'};
     }
   }
+
+  Future<Map<String, dynamic>> registrationCheck(String program, String id) async {
+    try {
+      final headers = await getHeaders();
+      final response = await dio.post(
+        '$baseUrl/fetch_register',
+        options: Options(headers: headers),
+        data: jsonEncode({
+          'studentId': id,
+          'program':program
+        }),
+      );
+
+      // print("Response: ${response.data}");
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'data': response.data};
+      } else if (response.statusCode == 401) {
+        return {'success': false, 'message': 'Unauthorized access'};
+      } else {
+        return {'success': false, 'message': 'Failed to post complaint'};
+      }
+    } catch (e) {
+      print("API Exception: $e");
+      return {'success': false, 'message': 'Connection error $e'};
+    }
+  }
 }
 
