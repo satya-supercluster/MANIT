@@ -31,7 +31,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     if (authProvider.currentUser != null) {
       final studentuid = authProvider.currentUser!.id;
       final program = authProvider.currentUser!.programMasterId;
-      await studentDataProvider.registerCheck(program,studentuid);
+      await studentDataProvider.registerCheck(program, studentuid);
     }
   }
 
@@ -59,130 +59,61 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
-  // Future<void> _handleDelete(String studentuid, String session, int semesterTypeIdCode, 
-  //                            String programMasterId, String semesterTermNoIdCode) async {
-  //   final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    
-  //   try {
-  //     final result = await authProvider.regDelete({
-  //       'studentuid': studentuid,
-  //       'session': session,
-  //       'semester_type_id_code': semesterTypeIdCode,
-  //       'program_master_id': programMasterId,
-  //       'semester_term_no_id_code': semesterTermNoIdCode,
-  //     });
-      
-  //     if (result['code'] == 700) {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(content: Text('Successfully deleted!'), duration: Duration(seconds: 2))
-  //       );
-        
-  //       Future.delayed(Duration(seconds: 2), () {
-  //         Navigator.pushReplacementNamed(context, '/home');
-  //       });
-  //     } else {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(content: Text('Delete unsuccessful!'), duration: Duration(seconds: 3))
-  //       );
-  //     }
-  //   } catch (error) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text('Error deleting record!'), duration: Duration(seconds: 3))
-  //     );
-  //   }
-  // }
-
-  // Future<void> _handleConfirm(String studentuid, String session, int semesterTypeIdCode, 
-  //                             String programMasterId, String semesterTermNoIdCode) async {
-  //   final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    
-  //   try {
-  //     final result = await authProvider.regConfirm({
-  //       'studentuid': studentuid,
-  //       'session': session,
-  //       'semester_type_id_code': semesterTypeIdCode,
-  //       'program_master_id': programMasterId,
-  //       'semester_term_no_id_code': semesterTermNoIdCode,
-  //     });
-      
-  //     if (result['code'] == 700) {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(content: Text('Successfully confirmed!'), duration: Duration(seconds: 2))
-  //       );
-        
-  //       Future.delayed(Duration(seconds: 2), () {
-  //         Navigator.pushReplacementNamed(context, '/home');
-  //       });
-  //     } else {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(content: Text('Confirm unsuccessful!'), duration: Duration(seconds: 3))
-  //       );
-  //     }
-  //   } catch (error) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text('Error confirming record!'), duration: Duration(seconds: 3))
-  //     );
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
-    final studentDataProvider = Provider.of<StudentDataProvider>(context, listen: false);
+    final studentDataProvider = Provider.of<StudentDataProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text('Semester Registration'),
       ),
-      body:SingleChildScrollView(
-            child: RefreshIndicator(
-              onRefresh: () async =>_fetchRegistrationData(),
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Card(
-                  elevation: 4,
-                  child: Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Semester Registration',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 16),
-                        
-                        // Register Now Button
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue,
-                              foregroundColor: Colors.white,
-                              padding: EdgeInsets.symmetric(vertical: 12),
-                            ),
-                            onPressed: () => print("hello"),
-                            child: Text('Register Now', style: TextStyle(fontSize: 16)),
-                          ),
-                        ),
-                        
-                        SizedBox(height: 16),
-                        
-                        // Status Display
-                        if (studentDataProvider.isLoading)
-                          Center(child: CircularProgressIndicator())
-                        else if (studentDataProvider.registrationData != null && studentDataProvider.registrationData!.isNotEmpty)
-                          _buildAccordionList(studentDataProvider)
-                        else
-                          Text('No registration data available.'),
-                      ],
+      body: RefreshIndicator(
+        onRefresh: () async => _fetchRegistrationData(),
+        child: ListView(
+          children: [
+            Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Semester Registration',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
+                  SizedBox(height: 16),
+                  
+                  // Register Now Button - Fixed with constrained width
+                  Container(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      onPressed: () => print("hello"),
+                      child: Text('Register Now', style: TextStyle(fontSize: 16)),
+                    ),
+                  ),
+                  
+                  SizedBox(height: 16),
+                  
+                  // Status Display
+                  if (studentDataProvider.isLoading)
+                    Center(child: CircularProgressIndicator())
+                  else if (studentDataProvider.registrationData != null && 
+                           studentDataProvider.registrationData!.isNotEmpty)
+                    _buildAccordionList(studentDataProvider)
+                  else
+                    Text('No registration data available.'),
+                ],
               ),
             ),
-          )
+          ],
+        ),
+      )
     );
   }
 
@@ -229,66 +160,38 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       
                       SizedBox(height: 16),
                       
-                      // Action Buttons (View Subjects, View Slip)
+                      // Action Buttons (View Subjects, View Slip) - FIXED
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green[700],
-                              foregroundColor: Colors.white,
+                          Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 8.0),
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green[700],
+                                  foregroundColor: Colors.white,
+                                ),
+                                onPressed: () => _viewSubjects(item.subjects),
+                                child: Text('Subjects'),
+                              ),
                             ),
-                            onPressed: () => _viewSubjects(item.subjects),
-                            child: Text('Subjects'),
                           ),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue[700],
-                              foregroundColor: Colors.white,
+                          Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 8.0),
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blue[700],
+                                  foregroundColor: Colors.white,
+                                ),
+                                onPressed: () => _viewSlip(item),
+                                child: Text('Slip'),
+                              ),
                             ),
-                            onPressed: () => _viewSlip(item),
-                            child: Text('Slip'),
                           ),
                         ],
                       ),
-                      
-                      // Show Delete/Confirm buttons only if status is "Submitted"
-                      // if (item.currentStatus == "Submitted") ...[
-                      //   SizedBox(height: 16),
-                      //   Row(
-                      //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      //     children: [
-                      //       ElevatedButton(
-                      //         style: ElevatedButton.styleFrom(
-                      //           backgroundColor: Colors.red,
-                      //           foregroundColor: Colors.white,
-                      //         ),
-                      //         onPressed: () => _handleDelete(
-                      //           authProvider.currentUser!.id,
-                      //           item.regSession,
-                      //           item.regSemesterTypeIdCode,
-                      //           authProvider.currentUser!.programMasterId,
-                      //           '1', // Assuming semester_term_no_id_code
-                      //         ),
-                      //         child: Text('Delete'),
-                      //       ),
-                      //       ElevatedButton(
-                      //         style: ElevatedButton.styleFrom(
-                      //           backgroundColor: Colors.green,
-                      //           foregroundColor: Colors.white,
-                      //         ),
-                      //         onPressed: () => _handleConfirm(
-                      //           authProvider.currentUser!.id,
-                      //           item.regSession,
-                      //           item.regSemesterTypeIdCode,
-                      //           authProvider.currentUser!.programMasterId,
-                      //           '1', // Assuming semester_term_no_id_code
-                      //         ),
-                      //         child: Text('Confirm'),
-                      //       ),
-                      //     ],
-                      //   ),
-                      // ],
                     ],
                   ),
                 ),
@@ -465,22 +368,32 @@ class RegistrationSlipScreen extends StatelessWidget {
                   
                   SizedBox(height: 32),
                   
-                  // Action Buttons
+                  // Action Buttons - FIXED
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      ElevatedButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text('Back'),
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 8.0),
+                          child: ElevatedButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text('Back'),
+                          ),
+                        ),
                       ),
-                      ElevatedButton(
-                        onPressed: () {
-                          // In a real app, we would implement printing functionality
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Printing document...'))
-                          );
-                        },
-                        child: Text('Print Page'),
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 8.0),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              // In a real app, we would implement printing functionality
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Printing document...'))
+                              );
+                            },
+                            child: Text('Print Page'),
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -501,7 +414,7 @@ class RegistrationSlipScreen extends StatelessWidget {
   }
 }
 
-// Subject Details Screen
+// Subject Details Screen - FIXED
 class SubjectDetailsScreen extends StatelessWidget {
   final List<Subject> subjects;
 
@@ -535,29 +448,32 @@ class SubjectDetailsScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 16),
                 
+                // Fixed layout with Expanded
                 Expanded(
                   child: subjects.isNotEmpty 
                     ? SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
-                        child: DataTable(
-                          columns: [
-                            DataColumn(label: Text('Subject Code')),
-                            DataColumn(label: Text('Subject Name')),
-                            DataColumn(label: Text('Component Name')),
-                            DataColumn(label: Text('Semester Code')),
-                            DataColumn(label: Text('Subject Teacher')),
-                          ],
-                          rows: subjects.map((subject) {
-                            return DataRow(
-                              cells: [
-                                DataCell(Text(subject.subjectCode)),
-                                DataCell(Text(subject.subjectName)),
-                                DataCell(Text(subject.componentName)),
-                                DataCell(Text(subject.semesterCode)),
-                                DataCell(Text(subject.subjectTeacher)),
-                              ],
-                            );
-                          }).toList(),
+                        child: SingleChildScrollView(
+                          child: DataTable(
+                            columns: [
+                              DataColumn(label: Text('Subject Code')),
+                              DataColumn(label: Text('Subject Name')),
+                              DataColumn(label: Text('Component Name')),
+                              DataColumn(label: Text('Semester Code')),
+                              DataColumn(label: Text('Subject Teacher')),
+                            ],
+                            rows: subjects.map((subject) {
+                              return DataRow(
+                                cells: [
+                                  DataCell(Text(subject.subjectCode)),
+                                  DataCell(Text(subject.subjectName)),
+                                  DataCell(Text(subject.componentName)),
+                                  DataCell(Text(subject.semesterCode)),
+                                  DataCell(Text(subject.subjectTeacher)),
+                                ],
+                              );
+                            }).toList(),
+                          ),
                         ),
                       )
                     : Center(

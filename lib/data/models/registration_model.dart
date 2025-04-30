@@ -34,7 +34,7 @@ class RegistrationDetails {
       regSession: json['reg_session']?.toString() ?? 'N/A',
       regSemesterTypeIdCode: json['reg_semester_type_id_code']?.toString() ?? 'N/A',
       currentStatus: json['current_status']?.toString() ?? 'N/A',
-      feesStatus: json['fees_status']?.toString() ?? 'N/A',
+      feesStatus: json['feesStatus']?.toString() ?? 'N/A',
       creationTime: json['creation_time']?.toString() ?? 'N/A',
       subjects: List<Subject>.from(json['subjects'].map((subject) => Subject.fromJson(subject))),
       credits: json['credits']?.toString() ?? 'N/A',
